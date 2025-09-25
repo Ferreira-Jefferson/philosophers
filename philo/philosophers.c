@@ -33,30 +33,31 @@ int	main(int argc, char *argv[])
 	}
 	ft_init_philos(argc, argv, &philos);
 	ft_start(&philos);
+	free(philos);
 	return (0);
 }
 
 void *ft_core(void *args)
 {
-	t_philos *philos;
+	t_philos *philo;
 
-	philos = (t_philos *) args;
+	philo = (t_philos *) args;
 	pthread_mutex_t *forks;
-	forks = philos->forks.vet;
+	forks = philo->forks.vet;
 	int i = 0;
 	while (i < 2)
 	{
-		pthread_mutex_lock(&forks[philos->forks.left]);
-		pthread_mutex_lock(&forks[philos->forks.right]);
-				printf("timestamp_in_ms %d has taken a fork\n", philos->id_philo);
-				printf("timestamp_in_ms %d is eating\n", philos->id_philo);
-				usleep(philos->time_to_eat * 1000);
-		pthread_mutex_unlock(&forks[philos->forks.left]);
-		pthread_mutex_unlock(&forks[philos->forks.right]);
-				printf("timestamp_in_ms %d is sleeping\n", philos->id_philo);
-				usleep(philos->time_to_sleep * 1000);
-				printf("timestamp_in_ms %d is thinking\n", philos->id_philo);
-				usleep(philos->time_to_die * 1000);
+		pthread_mutex_lock(&forks[philo->forks.left]);
+		pthread_mutex_lock(&forks[philo->forks.right]);
+				printf("timestamp_in_ms %d has taken a fork\n", philo->id_philo);
+				printf("timestamp_in_ms %d is eating\n", philo->id_philo);
+				usleep(philo->time_to_eat * 1000);
+		pthread_mutex_unlock(&forks[philo->forks.left]);
+		pthread_mutex_unlock(&forks[philo->forks.right]);
+				printf("timestamp_in_ms %d is sleeping\n", philo->id_philo);
+				usleep(philo->time_to_sleep * 1000);
+				printf("timestamp_in_ms %d is thinking\n", philo->id_philo);
+				usleep(philo->time_to_die * 1000);
 		i++;
 	}
 	return (NULL);
@@ -72,7 +73,7 @@ void ft_assign_forks(t_philos **philos, pthread_mutex_t *forks)
 		if ((*philos)[qtd_philo].id_philo == 0)
 		{
 			(*philos)[qtd_philo].forks.left = (*philos)[qtd_philo].id_philo;
-			(*philos)[qtd_philo].forks.right = qtd_philo - 1;
+			(*philos)[qtd_philo].forks.right = (*philos)[qtd_philo].number_of_philosophers - 1;
 		}
 		else
 		{
