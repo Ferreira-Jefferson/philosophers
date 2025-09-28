@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 08:30:56 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/28 08:31:25 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,6 @@
 # define BLUE "\33[36m"
 # define END_COLOR "\033[0m"
 
-// struct comum
 typedef struct s_common {
 	int				number_of_philosophers;
 	long			time_to_die;
@@ -41,7 +40,6 @@ typedef struct s_common {
 	pthread_mutex_t	printf_mutex;
 }	t_common;
 
-// struct individual
 typedef struct s_philo {
 	int				id_philo;
 	struct timeval	last_meal;
