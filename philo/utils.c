@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:21:34 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 08:52:20 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/28 09:15:32 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	ft_validation(int argc, char *argv[])
 	return (0);
 }
 
-void	ft_threads_join(int quantity, pthread_t *thr_philos)
+void	ft_join(int quantity, pthread_t *thr_philos)
 {
 	int	i;
 
