@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers.h                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
+/*   Updated: 2025/09/28 08:30:56 by jtertuli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
@@ -24,18 +36,23 @@ typedef struct s_common {
 	long			time_to_sleep;
 	long			number_of_times_must_eat;
 	int				shutdown;
-	pthread_mutex_t *forks_mutex;
-	pthread_mutex_t shutdown_mutex;
-	pthread_mutex_t printf_mutex;
-} t_common;
+	pthread_mutex_t	*forks_mutex;
+	pthread_mutex_t	shutdown_mutex;
+	pthread_mutex_t	printf_mutex;
+}	t_common;
 
 // struct individual
 typedef struct s_philo {
 	int				id_philo;
 	struct timeval	last_meal;
-	t_common 		*common;
-} t_philo;
+	t_common		*common;
+}	t_philo;
 
-int ft_validation(int argc, char *argv[]);
+// utils
+int	ft_validation(int argc, char *argv[]);
+
+// utils init
+int	ft_init_mutex(t_common **common);
+int	ft_init_common(int argc, char *argv[], t_common **common);
 
 #endif
