@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 08:41:02 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/28 08:52:24 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,7 @@ typedef struct s_philo {
 }	t_philo;
 
 // utils
+void	ft_free_common(t_common **common);
 void	ft_destroy_mutex(t_common *common);
 int		ft_validation(int argc, char *argv[]);
 void	ft_threads_join(int quantity, pthread_t *thr_philos);
