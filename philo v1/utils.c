@@ -1,0 +1,87 @@
+#include "philosophers.h"
+
+int ft_validation(int argc, char *argv[])
+{
+	int i;
+
+	if (argc == 1 || (argc < 5 || argc > 6))
+		return (1);
+	i = 1;
+	while (i < argc)
+	{
+		if (!ft_is_only_number(argv[i]))
+			return (1);
+		i++;
+	}
+	return (0);
+}
+
+void ft_init_philos(int argc, char *argv[], t_philos **philos)
+{
+	int qtd_philos;
+
+	qtd_philos = ft_atoi(argv[1]);
+	*philos = (t_philos *) malloc(qtd_philos * sizeof(t_philos));
+	if (!(*philos))
+		return ;
+	pthread_mutex_init(&(*philos)[0].action_mutex, NULL);
+	(*philos)[0].number_of_philosophers = qtd_philos;
+	while (--qtd_philos >= 0)
+	{
+		(*philos)[qtd_philos].id_philo = qtd_philos;
+		(*philos)[qtd_philos].number_of_philosophers = (*philos)[0].number_of_philosophers;
+		(*philos)[qtd_philos].time_to_die = ft_atoi(argv[2]);
+		(*philos)[qtd_philos].time_to_eat = ft_atoi(argv[3]);
+		(*philos)[qtd_philos].time_to_sleep = ft_atoi(argv[4]);
+		if (argc == 6)
+			(*philos)[qtd_philos].number_of_times_must_eat = ft_atoi(argv[5]);
+		gettimeofday(&(*philos)[qtd_philos].last_meal, NULL);
+		(*philos)[qtd_philos].action_mutex = (*philos)[0].action_mutex;
+	}
+}
+
+int ft_init_forks(int qtd_forks, pthread_mutex_t *forks)
+{
+	while (--qtd_forks >= 0)
+	{
+		if (pthread_mutex_init(&forks[qtd_forks], NULL) != 0)
+		{
+			perror("Error: pthread_mutex_init failed");
+			return (1);
+		}
+	}
+	return (0);
+}
+
+void ft_assign_forks(t_philos **philos, pthread_mutex_t *forks)
+{
+	int qtd_philo;
+
+	qtd_philo = philos[0]->number_of_philosophers;
+	while (--qtd_philo >= 0)
+	{
+		if ((*philos)[qtd_philo].id_philo == 0)
+		{
+			(*philos)[qtd_philo].forks.left = (*philos)[qtd_philo].id_philo;
+			(*philos)[qtd_philo].forks.right = (*philos)[qtd_philo].number_of_philosophers - 1;
+		}
+		else
+		{
+			(*philos)[qtd_philo].forks.left = (*philos)[qtd_philo].id_philo;
+			(*philos)[qtd_philo].forks.right = (*philos)[qtd_philo].id_philo - 1;
+		}
+		(*philos)[qtd_philo].forks.vet = forks;
+	}
+}
+
+void ft_threads_join(int qtd_forks, pthread_t *philos)
+{
+	while (--qtd_forks >= 0)
+		pthread_join(philos[qtd_forks], NULL);
+}
+
+void ft_destroy_forks(int qtd_forks, pthread_mutex_t *forks)
+{
+	while (--qtd_forks >= 0)
+		pthread_mutex_destroy(&forks[qtd_forks]);
+}
