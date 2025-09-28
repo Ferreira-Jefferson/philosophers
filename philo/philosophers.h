@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 09:15:39 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/28 17:08:50 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,8 +47,9 @@ typedef struct s_philo {
 }	t_philo;
 
 // phipholophers.c
-void	ft_start(t_common **common);
 void	*ft_core(void *args);
+void	ft_start(t_common **common);
+void	ft_create(pthread_t	*thr_philos, t_philo *philos, t_common *common);
 
 // utils.c
 void	ft_free_common(t_common **common);

@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:26:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 09:17:18 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/28 17:31:55 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 int	main(int argc, char *argv[])
 {
 	t_common	*common;
+	int			error;
 
 	if (ft_validation(argc, argv))
 	{
@@ -25,16 +26,16 @@ int	main(int argc, char *argv[])
 		printf("%s\n", END_COLOR);
 		return (0);
 	}
-	ft_init_common(argc, argv, &common);
-	ft_start(&common);
+	error = ft_init_common(argc, argv, &common);
+	if (!error)
+		ft_start(&common);
 	ft_free_common(&common);
 	return (0);
 }
 
 void ft_start(t_common **common)
 {
-	int i;
-	int quantity;
+	int			quantity;
 	pthread_t	*thr_philos;
 	t_philo		*philos;	
 
@@ -48,20 +49,35 @@ void ft_start(t_common **common)
 		ft_to_free((void **) &philos);
 		return ;
 	}
+	ft_create(thr_philos, philos, *common);
+	ft_join(quantity, thr_philos);
+	ft_destroy_mutex(*common);
+	ft_to_free((void **) &philos);
+	ft_to_free((void **) &thr_philos);
+}
+
+void	ft_create(pthread_t	*thr_philos, t_philo *philos, t_common *common)
+{
+	int	i;
+	int	quantity;
+
+	quantity = common->number_of_philosophers;
 	i = 0;
 	while (i < quantity)
 	{
 		philos[i].id_philo = i;
 		gettimeofday(&philos[i].last_meal, NULL);
 		philos[i].common = common;
-		pthread_create(&thr_philos[i], NULL, ft_core, &philos[i]);
+		pthread_create(&thr_philos[i], NULL, &ft_core, &philos[i]);
 		i++;
 	}
-	ft_join(quantity, thr_philos);
-	ft_destroy_mutex(common);
 }
 
 void	*ft_core(void *args)
 {
+	t_philo *philo;
+
+	philo = (t_philo *) args;
+	
 	return (NULL);
 }
