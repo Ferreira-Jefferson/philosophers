@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 17:08:50 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/29 11:12:30 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,7 @@ typedef struct s_common {
 	pthread_mutex_t	*forks_mutex;
 	pthread_mutex_t	shutdown_mutex;
 	pthread_mutex_t	printf_mutex;
+	pthread_mutex_t	last_meal_mutex;
 }	t_common;
 
 typedef struct s_philo {
