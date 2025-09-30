@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:21:34 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/28 17:19:50 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/30 17:01:42 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,36 @@ void	ft_free_common(t_common **common)
 {
 	ft_to_free((void **) &(*common)->forks_mutex);
 	ft_to_free((void **) common);
+}
+
+long ft_get_time_ms(const struct timeval *time)
+{
+	return ((time->tv_sec * 1000) + (time->tv_usec / 1000));
+}
+
+int	ft_verify_death(t_philo *philo)
+{
+	struct timeval now;
+
+	pthread_mutex_lock(&philo->common->shutdown_mutex);
+		if (philo->common->shutdown == 1)
+		{
+			pthread_mutex_unlock(&philo->common->shutdown_mutex);
+			return (1);			
+		}		
+	pthread_mutex_unlock(&philo->common->shutdown_mutex);
+
+	gettimeofday(&now, NULL);
+	pthread_mutex_lock(&philo->common->shutdown_mutex);		
+		if (ft_get_time_ms(&now) > ft_get_time_ms(&philo->last_meal) + philo->common->time_to_die)
+		{			
+			pthread_mutex_lock(&philo->common->printf_mutex);
+				printf("%ld %d is died\n", ft_get_time_ms(&now), philo->id_philo);
+			pthread_mutex_unlock(&philo->common->printf_mutex);
+			philo->common->shutdown = 1;
+			pthread_mutex_unlock(&philo->common->shutdown_mutex);
+			return (1);
+		}
+	pthread_mutex_unlock(&philo->common->shutdown_mutex);
+	return (0);
 }

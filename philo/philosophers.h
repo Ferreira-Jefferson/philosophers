@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/29 11:12:30 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/09/30 17:26:25 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,15 @@ typedef struct s_philo {
 void	*ft_core(void *args);
 void	ft_start(t_common **common);
 void	ft_create(pthread_t	*thr_philos, t_philo *philos, t_common *common);
+void ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork);
 
 // utils.c
 void	ft_free_common(t_common **common);
 void	ft_destroy_mutex(t_common *common);
 int		ft_validation(int argc, char *argv[]);
 void	ft_join(int quantity, pthread_t *thr_philos);
+int	ft_verify_death(t_philo *philo);
+long ft_get_time_ms(const struct timeval *time);
 
 // utils_init.c
 int		ft_init_mutex(t_common **common);
