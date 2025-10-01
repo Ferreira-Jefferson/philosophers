@@ -6,22 +6,11 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/29 11:37:22 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/01 15:15:46 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-int	ft_destroy_mutex_error(t_common **common, int error, int i)
-{
-	if (!error)
-		return (0);
-	while (i--)
-		pthread_mutex_destroy(&(*common)->forks_mutex[i]);
-	pthread_mutex_destroy(&(*common)->shutdown_mutex);
-	pthread_mutex_destroy(&(*common)->printf_mutex);
-	return (error);
-}
 
 int	ft_init_mutex(t_common **common)
 {
@@ -34,13 +23,6 @@ int	ft_init_mutex(t_common **common)
 	error = pthread_mutex_init(&(*common)->printf_mutex, NULL);
 	if (error)
 		return (pthread_mutex_destroy(&(*common)->shutdown_mutex) + 1);
-	error = pthread_mutex_init(&(*common)->last_meal_mutex, NULL);
-	if (error)
-	{
-		pthread_mutex_destroy(&(*common)->shutdown_mutex);
-		pthread_mutex_destroy(&(*common)->printf_mutex);
-		return (1);
-	}
 	i = 0;
 	while (i < (*common)->number_of_philosophers)
 	{
@@ -49,7 +31,14 @@ int	ft_init_mutex(t_common **common)
 			break ;
 		i++;
 	}
-	return (ft_destroy_mutex_error(common, error, i));
+	if (error)
+	{
+		while (i--)
+			pthread_mutex_destroy(&(*common)->forks_mutex[i]);
+		pthread_mutex_destroy(&(*common)->shutdown_mutex);
+		pthread_mutex_destroy(&(*common)->printf_mutex);
+	}
+	return (error);
 }
 
 int	ft_init_common(int argc, char *argv[], t_common **common)
@@ -57,6 +46,7 @@ int	ft_init_common(int argc, char *argv[], t_common **common)
 	*common = (t_common *) malloc(sizeof(t_common));
 	if (*common == NULL)
 		return (1);
+	(*common)->shutdown = 0;
 	(*common)->number_of_philosophers = ft_atoi(argv[1]);
 	(*common)->time_to_die = ft_atoi(argv[2]);
 	(*common)->time_to_eat = ft_atoi(argv[3]);
@@ -64,7 +54,6 @@ int	ft_init_common(int argc, char *argv[], t_common **common)
 	(*common)->number_of_times_must_eat = -1;
 	if (argc == 6)
 		(*common)->number_of_times_must_eat = ft_atoi(argv[5]);
-	(*common)->shutdown = 0;
 	(*common)->forks_mutex = (pthread_mutex_t *) \
 		malloc((*common)->number_of_philosophers * sizeof(pthread_mutex_t));
 	if ((*common)->forks_mutex == NULL)

@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/30 17:26:25 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/01 15:24:19 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,28 +38,39 @@ typedef struct s_common {
 	pthread_mutex_t	*forks_mutex;
 	pthread_mutex_t	shutdown_mutex;
 	pthread_mutex_t	printf_mutex;
-	pthread_mutex_t	last_meal_mutex;
 }	t_common;
 
 typedef struct s_philo {
 	int				id_philo;
-	struct timeval	last_meal;
+	long			last_meal;
+	long			number_time_eat;
+	pthread_mutex_t	last_meal_mutex;
 	t_common		*common;
 }	t_philo;
 
 // phipholophers.c
-void	*ft_core(void *args);
+int		ft_validation(int argc, char *argv[]);
+
+// monitor.c
+void	*ft_monitor(void *args);
+
+// core.c
 void	ft_start(t_common **common);
-void	ft_create(pthread_t	*thr_philos, t_philo *philos, t_common *common);
-void ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork);
+void	*ft_core(void *args);
+int		ft_should_shutdown(t_philo *philo);
+void	ft_eating(t_philo *philo);
+
+// utils_core.c
+void	ft_create(pthread_t	*thr_philos, pthread_t	*thr_monitor, \
+	t_philo *philos, t_common *common);
+void	ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork);
 
 // utils.c
-void	ft_free_common(t_common **common);
+void	ft_print_message(t_philo *philo, char *message);
+void	ft_join(int quantity, pthread_t *thr_philos, pthread_t	*thr_monitor);
 void	ft_destroy_mutex(t_common *common);
-int		ft_validation(int argc, char *argv[]);
-void	ft_join(int quantity, pthread_t *thr_philos);
-int	ft_verify_death(t_philo *philo);
-long ft_get_time_ms(const struct timeval *time);
+void	ft_free_common(t_common **common);
+long	ft_get_time_ms(void);
 
 // utils_init.c
 int		ft_init_mutex(t_common **common);

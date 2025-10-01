@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:26:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/09/30 18:06:25 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/01 15:16:46 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,141 +33,18 @@ int	main(int argc, char *argv[])
 	return (0);
 }
 
-void ft_start(t_common **common)
-{
-	int			quantity;
-	pthread_t	*thr_philos;
-	t_philo		*philos;	
-
-	quantity = (*common)->number_of_philosophers;
-	philos = (t_philo *) malloc(quantity * sizeof(t_philo));
-	if (!philos)
-		return ;
-	thr_philos = (pthread_t *) malloc(quantity * sizeof(pthread_t));
-	if (!thr_philos)
-	{
-		ft_to_free((void **) &philos);
-		return ;
-	}
-	ft_create(thr_philos, philos, *common);
-	ft_join(quantity, thr_philos);
-	ft_destroy_mutex(*common);
-	ft_to_free((void **) &philos);
-	ft_to_free((void **) &thr_philos);
-}
-
-void	ft_create(pthread_t	*thr_philos, t_philo *philos, t_common *common)
+int	ft_validation(int argc, char *argv[])
 {
 	int	i;
-	int	quantity;
 
-	quantity = common->number_of_philosophers;
-	i = 0;
-	while (i < quantity)
+	if (argc == 1 || (argc < 5 || argc > 6))
+		return (1);
+	i = 1;
+	while (i < argc)
 	{
-		philos[i].id_philo = i;
-		philos[i].common = common;
-		gettimeofday(&philos[i].last_meal, NULL);
-		pthread_create(&thr_philos[i], NULL, &ft_core, &philos[i]);
+		if (!ft_is_only_number(argv[i]))
+			return (1);
 		i++;
 	}
-}
-
-
-void ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork)
-{
-	int				id;
-	
-	id = philo->id_philo;
-	*left_fork = id;
-	*right_fork = (id + 1) % philo->common->number_of_philosophers;
-	if (*left_fork > *right_fork)
-	{
-		*right_fork = *left_fork ^ *right_fork;
-		*left_fork = *left_fork ^ *right_fork;
-		*right_fork = *left_fork ^ *right_fork;
-	}
-}
-
-void ft_thinking(t_philo *philo)
-{
-	struct timeval	now;
-
-	gettimeofday(&now, NULL);
-	pthread_mutex_lock(&philo->common->printf_mutex);
-		printf("%ld %d is thinking\n", ft_get_time_ms(&now), philo->id_philo);
-	pthread_mutex_unlock(&philo->common->printf_mutex);
-}
-
-void ft_sleeping(t_philo *philo)
-{
-	struct timeval	now;
-	
-	gettimeofday(&now, NULL);
-	pthread_mutex_lock(&philo->common->printf_mutex);
-		printf("%ld %d is sleeping\n", ft_get_time_ms(&now), philo->id_philo);
-	pthread_mutex_unlock(&philo->common->printf_mutex);
-	usleep(philo->common->time_to_sleep * 1000);
-}
-
-void ft_eating(t_philo *philo, int left_fork, int right_fork)
-{
-	struct timeval	now;
-
-	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
-		gettimeofday(&now, NULL);
-		pthread_mutex_lock(&philo->common->printf_mutex);
-			printf("%ld %d has taken a fork\n", ft_get_time_ms(&now), philo->id_philo);
-		pthread_mutex_unlock(&philo->common->printf_mutex);
-	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
-		gettimeofday(&now, NULL);
-		pthread_mutex_lock(&philo->common->printf_mutex);
-			printf("%ld %d has taken a fork\n", ft_get_time_ms(&now), philo->id_philo);
-		pthread_mutex_unlock(&philo->common->printf_mutex);
-		gettimeofday(&now, NULL);
-		
-		pthread_mutex_lock(&philo->common->last_meal_mutex);
-			philo->last_meal = now;
-		pthread_mutex_unlock(&philo->common->last_meal_mutex);
-		
-		pthread_mutex_lock(&philo->common->printf_mutex);
-			printf("%ld %d is eating\n", ft_get_time_ms(&now), philo->id_philo);
-		pthread_mutex_unlock(&philo->common->printf_mutex);
-		pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
-	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);		
-	usleep(philo->common->time_to_eat * 1000);
-}
-
-void	*ft_core(void *args)
-{
-	t_philo 		*philo;
-	int				left_fork;
-	int				right_fork;
-
-	int				number_of_times_must_eat;
-
-	philo = (t_philo *) args;
-
-	ft_get_forks_id(philo, &left_fork, &right_fork);
-	pthread_mutex_lock(&philo->common->shutdown_mutex);
-		number_of_times_must_eat = philo->common->number_of_times_must_eat;
-	pthread_mutex_unlock(&philo->common->shutdown_mutex);
-	while (number_of_times_must_eat)
-	{
-		if (ft_verify_death(philo))
-			break;
-
-		ft_eating(philo, left_fork, right_fork);
-		ft_sleeping(philo);
-		ft_thinking(philo);
-
-		if (number_of_times_must_eat > 0)
-		{
-			number_of_times_must_eat -= 1;
-			pthread_mutex_lock(&philo->common->shutdown_mutex);
-				philo->common->shutdown = 1;
-			pthread_mutex_unlock(&philo->common->shutdown_mutex);
-		}
-	}
-	return (NULL);
+	return (0);
 }
