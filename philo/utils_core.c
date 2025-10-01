@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 15:11:38 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/01 18:06:08 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -75,8 +75,11 @@ void	ft_eating(t_philo *philo)
 	ft_get_forks_id(philo, &left_fork, &right_fork);
 	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
 	ft_print_message(philo, "has taken a fork");
-	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
-	ft_print_message(philo, "has taken a fork");
+	if (philo->common->number_of_philosophers > 1)
+	{
+		pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
+		ft_print_message(philo, "has taken a fork");
+	}
 	ft_print_message(philo, "is eating");
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->number_time_eat++;
@@ -84,7 +87,8 @@ void	ft_eating(t_philo *philo)
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 	philo->last_meal = ft_get_time_ms();
 	pthread_mutex_unlock(&philo->common->shutdown_mutex);
-	pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
+	if (philo->common->number_of_philosophers > 1)
+		pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
 	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
 	usleep(philo->common->time_to_eat * 1000);
 }
