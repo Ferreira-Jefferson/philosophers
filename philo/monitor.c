@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:05 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 18:13:02 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 10:15:31 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 static int	ft_verify_death(t_philo *philo)
 {
-	long stop_by_meal;
+	long	stop_by_meal;
 
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 		stop_by_meal = philo->common->number_of_times_must_eat != -1;

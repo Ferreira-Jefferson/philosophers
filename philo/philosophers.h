@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 08:32:15 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 10:16:46 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,6 +49,11 @@ typedef struct s_philo {
 
 # define INT_MIN -2147483648
 # define INT_MAX 2147483647
+
+// libft.c
+int		ft_isdigit(int c);
+int		ft_is_only_number(char *str);
+int		ft_atoi(const char *nptr);
 
 // phipholophers.c
 int		ft_validation(int argc, char *argv[]);

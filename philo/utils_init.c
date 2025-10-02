@@ -6,71 +6,35 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 08:30:02 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 10:13:38 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
-
-int	ft_isdigit(int c)
-{
-	return (c >= '0' && c <= '9');
-}
-
-static int	ft_atoi(const char *nptr)
-{
-	unsigned int	nb;
-	int				signal;
-
-	if (*nptr == '\0')
-		return (0);
-	while (*nptr == ' ' || (*nptr >= '\t' && *nptr <= '\r'))
-		nptr++;
-	signal = 1;
-	if (*nptr == '+' || *nptr == '-' )
-	{
-		if (*nptr == '-')
-			signal = -1;
-		nptr++;
-	}
-	nb = 0;
-	while (ft_isdigit(*nptr))
-	{
-		nb = (nb * 10) + (*nptr - '0');
-		if (signal == -1 && nb >= INT_MAX)
-			return (INT_MIN);
-		if (nb > INT_MAX)
-			return (INT_MAX);
-		nptr++;
-	}
-	return (nb * signal);
-}
 
 int	ft_init_mutex(t_common **common)
 {
 	int	i;
 	int	error;
 
-	error = pthread_mutex_init(&(*common)->shutdown_mutex, NULL);
-	if (error)
+	if (pthread_mutex_init(&(*common)->shutdown_mutex, NULL))
 		return (1);
-	error = pthread_mutex_init(&(*common)->printf_mutex, NULL);
-	if (error)
+	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
 		return (pthread_mutex_destroy(&(*common)->shutdown_mutex) + 1);
+	error = 0;
 	i = 0;
 	while (i < (*common)->number_of_philosophers)
 	{
 		error += pthread_mutex_init(&(*common)->forks_mutex[i], NULL);
 		if (error)
+		{
+			while (i--)
+				pthread_mutex_destroy(&(*common)->forks_mutex[i]);
+			pthread_mutex_destroy(&(*common)->shutdown_mutex);
+			pthread_mutex_destroy(&(*common)->printf_mutex);
 			break ;
+		}
 		i++;
-	}
-	if (error)
-	{
-		while (i--)
-			pthread_mutex_destroy(&(*common)->forks_mutex[i]);
-		pthread_mutex_destroy(&(*common)->shutdown_mutex);
-		pthread_mutex_destroy(&(*common)->printf_mutex);
 	}
 	return (error);
 }
