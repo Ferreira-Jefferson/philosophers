@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:21:34 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 15:15:16 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 08:55:08 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,8 +48,8 @@ void	ft_destroy_mutex(t_common *common)
 
 void	ft_free_common(t_common **common)
 {
-	ft_to_free((void **) &(*common)->forks_mutex);
-	ft_to_free((void **) common);
+	free((*common)->forks_mutex);
+	free(*common);
 }
 
 long	ft_get_time_ms(void)

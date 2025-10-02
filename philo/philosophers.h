@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 15:24:19 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 08:32:15 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,11 @@
 # define PHILOSOPHERS_H
 
 # define _DEFAULT_SOURCE
-# include <pthread.h>
 # include <stdio.h>
 # include <stdlib.h>
+# include <unistd.h>
+# include <pthread.h>
 # include <sys/time.h>
-
-# include "../libft/libft.h"
 
 # define RED_BOLD "\033[1;31m"
 # define RED "\33[31m"
@@ -47,6 +46,9 @@ typedef struct s_philo {
 	pthread_mutex_t	last_meal_mutex;
 	t_common		*common;
 }	t_philo;
+
+# define INT_MIN -2147483648
+# define INT_MAX 2147483647
 
 // phipholophers.c
 int		ft_validation(int argc, char *argv[]);

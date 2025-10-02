@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:26:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 15:16:46 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 08:28:27 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,6 +31,22 @@ int	main(int argc, char *argv[])
 		ft_start(&common);
 	ft_free_common(&common);
 	return (0);
+}
+
+static int	ft_isdigit(int c)
+{
+	return (c >= '0' && c <= '9');
+}
+
+static int	ft_is_only_number(char *str)
+{
+	while (*str)
+	{
+		if (!ft_isdigit(*str))
+			return (0);
+		str++;
+	}
+	return (1);
 }
 
 int	ft_validation(int argc, char *argv[])

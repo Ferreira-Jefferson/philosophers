@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:11:45 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 15:24:16 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 08:13:52 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,14 +26,14 @@ void	ft_start(t_common **common)
 	thr_philos = (pthread_t *) malloc(quantity * sizeof(pthread_t));
 	if (!thr_philos)
 	{
-		ft_to_free((void **) &philos);
+		free(philos);
 		return ;
 	}
 	ft_create(thr_philos, &thr_monitor, philos, *common);
 	ft_join(quantity, thr_philos, &thr_monitor);
 	ft_destroy_mutex(*common);
-	ft_to_free((void **) &philos);
-	ft_to_free((void **) &thr_philos);
+	free(philos);
+	free(thr_philos);
 }
 
 void	*ft_core(void *args)
