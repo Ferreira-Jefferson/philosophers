@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/01 18:06:08 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:02:32 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,8 +87,8 @@ void	ft_eating(t_philo *philo)
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 	philo->last_meal = ft_get_time_ms();
 	pthread_mutex_unlock(&philo->common->shutdown_mutex);
+	usleep(philo->common->time_to_eat * 1000);
 	if (philo->common->number_of_philosophers > 1)
 		pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
 	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
-	usleep(philo->common->time_to_eat * 1000);
 }

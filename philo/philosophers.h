@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 10:16:46 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 14:54:25 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,9 +34,11 @@ typedef struct s_common {
 	long			time_to_sleep;
 	long			number_of_times_must_eat;
 	int				shutdown;
+	long			start_time;
 	pthread_mutex_t	*forks_mutex;
 	pthread_mutex_t	shutdown_mutex;
 	pthread_mutex_t	printf_mutex;
+	pthread_mutex_t	start_time_mutex;
 }	t_common;
 
 typedef struct s_philo {

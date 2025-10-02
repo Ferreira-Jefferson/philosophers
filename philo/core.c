@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:11:45 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 08:13:52 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:05:24 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,8 +41,6 @@ void	*ft_core(void *args)
 	t_philo	*philo;
 
 	philo = (t_philo *) args;
-	if (philo->id_philo % 2 == 0)
-		usleep(1000);
 	while (!ft_should_shutdown(philo))
 	{
 		ft_eating(philo);

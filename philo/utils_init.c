@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 10:13:38 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:00:48 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,8 @@ int	ft_init_mutex(t_common **common)
 		return (1);
 	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
 		return (pthread_mutex_destroy(&(*common)->shutdown_mutex) + 1);
+	if (pthread_mutex_init(&(*common)->start_time_mutex, NULL))
+		return (pthread_mutex_destroy(&(*common)->printf_mutex) + 1);
 	error = 0;
 	i = 0;
 	while (i < (*common)->number_of_philosophers)
@@ -50,15 +52,13 @@ int	ft_init_common(int argc, char *argv[], t_common **common)
 	(*common)->time_to_eat = ft_atoi(argv[3]);
 	(*common)->time_to_sleep = ft_atoi(argv[4]);
 	(*common)->number_of_times_must_eat = -1;
+	(*common)->start_time = ft_get_time_ms();
 	if (argc == 6)
 		(*common)->number_of_times_must_eat = ft_atoi(argv[5]);
 	(*common)->forks_mutex = (pthread_mutex_t *) \
 		malloc((*common)->number_of_philosophers * sizeof(pthread_mutex_t));
 	if ((*common)->forks_mutex == NULL)
-	{
-		free(*common);
 		return (1);
-	}
 	if (ft_init_mutex(common) != 0)
 	{
 		free((*common)->forks_mutex);
