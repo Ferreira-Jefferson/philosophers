@@ -32,15 +32,12 @@ void	ft_start(t_common **common)
 	}
 	ft_create(thr_philos, &thr_monitor, philos, *common);
 	ft_join(quantity, thr_philos, &thr_monitor);
-	
-	// Destruir os mutexes last_meal de cada filósofo
 	i = 0;
 	while (i < quantity)
 	{
 		pthread_mutex_destroy(&philos[i].last_meal_mutex);
 		i++;
 	}
-	
 	ft_destroy_mutex(*common);
 	free(philos);
 	free(thr_philos);
@@ -51,12 +48,9 @@ void	*ft_core(void *args)
 	t_philo	*philo;
 
 	philo = (t_philo *) args;
-	
-	// Filósofos pares esperam um pouco para evitar deadlock
-	// Isso garante que filósofos ímpares peguem os garfos primeiro
+
 	if (philo->id_philo % 2 == 1)
 		usleep(100);
-	
 	while (!ft_should_shutdown(philo))
 	{
 		ft_eating(philo);
@@ -68,7 +62,6 @@ void	*ft_core(void *args)
 		if (!ft_should_shutdown(philo))
 		{
 			ft_print_message(philo, "is thinking");
-			// Pequeno delay para dar chance aos outros filósofos
 			usleep(100);
 		}
 	}

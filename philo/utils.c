@@ -12,25 +12,22 @@
 
 #include "philosophers.h"
 
-void	ft_print_message(t_philo *philo, char *message)
+void ft_print_message(t_philo *philo, char *message)
 {
-	long	timestamp;
-	int		should_print;
+    long timestamp;
+    int should_print;
 
-	pthread_mutex_lock(&philo->common->shutdown_mutex);
-	should_print = !philo->common->shutdown;
-	pthread_mutex_unlock(&philo->common->shutdown_mutex);
+    pthread_mutex_lock(&philo->common->shutdown_mutex);
+    should_print = !philo->common->shutdown;
+    pthread_mutex_unlock(&philo->common->shutdown_mutex);
 
-	// Só printa se não estiver em shutdown (exceto mensagem de morte)
-	if (should_print || message[0] == 'd') // "died"
-	{
-		pthread_mutex_lock(&philo->common->printf_mutex);
-		pthread_mutex_lock(&philo->common->start_time_mutex);
-		timestamp = ft_get_time_ms() - philo->common->start_time;
-		printf("%ld %d %s\n", timestamp, philo->id_philo + 1, message);
-		pthread_mutex_unlock(&philo->common->start_time_mutex);
-		pthread_mutex_unlock(&philo->common->printf_mutex);
-	}
+    if (should_print || message[0] == 'd')
+    {
+        timestamp = ft_get_time_ms() - philo->common->start_time;
+        pthread_mutex_lock(&philo->common->printf_mutex);
+        printf("%ld %d %s\n", timestamp, philo->id_philo + 1, message);
+        pthread_mutex_unlock(&philo->common->printf_mutex);
+    }
 }
 
 void	ft_join(int quantity, pthread_t *thr_philos, pthread_t *thr_monitor)

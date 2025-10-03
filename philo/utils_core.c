@@ -64,22 +64,18 @@ int	ft_should_shutdown(t_philo *philo)
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 	should_shutdown = philo->common->shutdown;
 	pthread_mutex_unlock(&philo->common->shutdown_mutex);
-	
-	// Protege a leitura de number_time_eat com o mutex correto
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	times_eaten = philo->number_time_eat;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
-	
 	fed = (philo->common->number_of_times_must_eat != -1 && 
 	       times_eaten >= philo->common->number_of_times_must_eat);
-	
 	return (should_shutdown || fed);
 }
 
 void	ft_eating(t_philo *philo)
 {
-	int				left_fork;
-	int				right_fork;
+	int	left_fork;
+	int	right_fork;
 
 	ft_get_forks_id(philo, &left_fork, &right_fork);
 	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
@@ -89,17 +85,12 @@ void	ft_eating(t_philo *philo)
 		pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
 		ft_print_message(philo, "has taken a fork");
 	}
-	
-	// CRITICAL: Atualiza last_meal ANTES de printar "is eating"
-	// e protege com o mutex correto (last_meal_mutex)
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = ft_get_time_ms();
 	philo->number_time_eat++;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
-	
 	ft_print_message(philo, "is eating");
 	usleep(philo->common->time_to_eat * 1000);
-	
 	if (philo->common->number_of_philosophers > 1)
 		pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
 	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);

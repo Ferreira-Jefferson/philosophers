@@ -18,7 +18,6 @@ static int	ft_verify_death(t_philo *philo)
 	long	current_time;
 	int		is_dead;
 
-	// Verifica se já está em shutdown
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 	if (philo->common->shutdown)
 	{
@@ -26,16 +25,11 @@ static int	ft_verify_death(t_philo *philo)
 		return (1);
 	}
 	pthread_mutex_unlock(&philo->common->shutdown_mutex);
-
-	// Lê last_meal com o mutex correto
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	last_meal_time = philo->last_meal;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
-
-	// Verifica morte
 	current_time = ft_get_time_ms();
 	is_dead = (current_time - last_meal_time) > philo->common->time_to_die;
-
 	if (is_dead)
 	{
 		pthread_mutex_lock(&philo->common->shutdown_mutex);
@@ -48,7 +42,6 @@ static int	ft_verify_death(t_philo *philo)
 		}
 		pthread_mutex_unlock(&philo->common->shutdown_mutex);
 	}
-
 	return (0);
 }
 
@@ -60,7 +53,6 @@ static int	ft_check_all_fed(t_philo *philos, int num_philos)
 
 	if (philos[0].common->number_of_times_must_eat == -1)
 		return (0);
-
 	all_fed = 1;
 	i = 0;
 	while (i < num_philos)
@@ -76,7 +68,6 @@ static int	ft_check_all_fed(t_philo *philos, int num_philos)
 		}
 		i++;
 	}
-
 	if (all_fed)
 	{
 		pthread_mutex_lock(&philos[0].common->shutdown_mutex);
@@ -84,7 +75,6 @@ static int	ft_check_all_fed(t_philo *philos, int num_philos)
 		pthread_mutex_unlock(&philos[0].common->shutdown_mutex);
 		return (1);
 	}
-
 	return (0);
 }
 
@@ -96,7 +86,6 @@ void	*ft_monitor(void *args)
 
 	philos = (t_philo *) args;
 	number_of_philos = philos[0].common->number_of_philosophers;
-
 	while (1)
 	{
 		i = 0;
@@ -106,11 +95,10 @@ void	*ft_monitor(void *args)
 				return (NULL);
 			i++;
 		}
-
 		if (ft_check_all_fed(philos, number_of_philos))
 			return (NULL);
-
-		usleep(1000); // Pequeno sleep para reduzir uso de CPU
+		usleep(500);
 	}
 	return (NULL);
+	
 }
