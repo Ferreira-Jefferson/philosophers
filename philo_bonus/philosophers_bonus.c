@@ -1,21 +1,35 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philosophers_bonus.c                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/28 08:26:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/06 13:50:50 by jtertuli         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philosophers_bonus.h"
+
+static int	ft_is_only_number(char *str)
+{
+	while (*str)
+	{
+		if (*str < '0' || *str > '9')
+			return (0);
+		str++;
+	}
+	return (1);
+}
+
+static int	ft_validation(int argc, char *argv[])
+{
+	int	i;
+
+	if (argc < 5 || argc > 6)
+		return (1);
+	i = 1;
+	while (i < argc)
+	{
+		if (!ft_is_only_number(argv[i]))
+			return (1);
+		i++;
+	}
+	return (0);
+}
 
 int	main(int argc, char *argv[])
 {
 	t_common	*common;
-	int			error;
 
 	if (ft_validation(argc, argv))
 	{
@@ -26,28 +40,15 @@ int	main(int argc, char *argv[])
 		printf("%s\n", END_COLOR);
 		return (0);
 	}
-	common = (t_common *) malloc(sizeof(t_common));
+	common = (t_common *)malloc(sizeof(t_common));
 	if (common == NULL)
 		return (1);
-	error = ft_init_common(argc, argv, &common);
-	if (!error)
-		ft_start(common);
-	free(common);
-	return (0);
-}
-
-int	ft_validation(int argc, char *argv[])
-{
-	int	i;
-
-	if (argc == 1 || (argc < 5 || argc > 6))
-		return (1);
-	i = 1;
-	while (i < argc)
+	if (ft_init_common(argc, argv, &common))
 	{
-		if (!ft_is_only_number(argv[i]))
-			return (1);
-		i++;
+		free(common);
+		return (1);
 	}
+	ft_start(common);
+	free(common);;
 	return (0);
 }

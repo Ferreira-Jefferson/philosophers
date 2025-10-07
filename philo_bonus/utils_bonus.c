@@ -1,20 +1,37 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   utils_bonus.c                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/28 08:21:34 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/06 14:40:05 by jtertuli         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "philosophers_bonus.h"
 
-void ft_print_message(t_philo *philo, char *message)
+void	ft_generate_sem_name(const char *base, int id, char *buffer, int i, int j)
 {
-    long timestamp;
+	char nbr[11];
+	int k;
+
+	i = 0;
+	while (base[i])
+	{
+		buffer[i] = base[i];
+		i++;
+	}
+	if (id == 0)
+	{
+		buffer[i++] = '0';
+		buffer[i] = '\0';
+		return ;
+	}
+	j = 0;
+	k = id;
+	while (k > 0)
+	{
+		nbr[j++] = (k % 10) + '0';
+		k /= 10;
+	}
+	while (j > 0)
+		buffer[i++] = nbr[--j];
+	buffer[i] = '\0';
+}
+
+void	ft_print_message(t_philo *philo, char *message)
+{
+	long	timestamp;
 
 	sem_wait(philo->common->sem_print);
 	timestamp = ft_get_time_ms() - philo->common->start_time;

@@ -1,28 +1,16 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philosophers_bonus.h                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/06 17:12:08 by jtertuli         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#ifndef PHILOSOPHERS_H
-# define PHILOSOPHERS_H
+#ifndef PHILOSOPHERS_BONUS_H
+# define PHILOSOPHERS_BONUS_H
 
 # define _DEFAULT_SOURCE
-# include <wait.h>
 # include <stdio.h>
-# include <fcntl.h>
 # include <stdlib.h>
 # include <unistd.h>
 # include <signal.h>
 # include <pthread.h>
 # include <semaphore.h>
 # include <sys/time.h>
+# include <sys/wait.h>
+# include <fcntl.h>
 
 # define RED_BOLD "\033[1;31m"
 # define RED "\33[31m"
@@ -31,59 +19,41 @@
 # define BLUE "\33[36m"
 # define END_COLOR "\033[0m"
 
-typedef struct s_common {
-	int		number_of_philosophers;
-	long	time_to_die;
-	long	time_to_eat;
-	long	time_to_sleep;
-	long	number_of_times_must_eat;
-	int		shutdown;
-	long	start_time;
-	sem_t	*sem_forks;
-	sem_t	*sem_print;
-}	t_common;
-
-typedef struct s_philo {
-	int			id_philo;
-	long		last_meal;
-	long		number_time_eat;
-	sem_t		*sem_last_meal;
-	sem_t		*sem_number_time_eat;
-	t_common	*common;
-}	t_philo;
-
 # define INT_MIN -2147483648
 # define INT_MAX 2147483647
 
-# define SEM_FORKS "/FORKS"
-# define SEM_PRINT "/PRINT"
-# define SEM_LAST_MEAL "/LAST_MEAL"
-# define SEM_NUMBER_TIME_EAT "/NUMBER_TIME_EAT"
+# define SEM_FORKS "/philo_forks"
+# define SEM_PRINT "/philo_print"
+# define SEM_BUTLER "/philo_butler"
+# define SEM_DATA_BASE "/philo_data_"
 
-// libft_bonus.c
-int		ft_isdigit(int c);
-int		ft_is_only_number(char *str);
+typedef struct s_common {
+	int				number_of_philosophers;
+	long			time_to_die;
+	long			time_to_eat;
+	long			time_to_sleep;
+	long			number_of_times_must_eat;
+	long			start_time;
+	sem_t			*sem_forks;
+	sem_t			*sem_print;
+	sem_t			*sem_butler;
+}	t_common;
+
+typedef struct s_philo {
+	int				id_philo;
+	long			last_meal;
+	long			number_time_eat;
+	pthread_t		monitor_thread;
+	sem_t			*data_sem;
+	char			data_sem_name[32];
+	t_common		*common;
+}	t_philo;
+
 int		ft_atoi(const char *nptr);
-
-// phipholophers_bonus.c
-int		ft_validation(int argc, char *argv[]);
-
-// monitor_bonus.c
-// void	*ft_monitor(void *args);
-
-// core_bonus.c
-void	ft_start(t_common *common);
-// void	*ft_core(void *args);
-// int		ft_should_shutdown(t_philo *philo);
-// void	ft_eating(t_philo *philo);
-
-// utils_bonus.c
-void	ft_print_message(t_philo *philo, char *message);
 long	ft_get_time_ms(void);
-
-// utils_init_bonus.c
+void	ft_start(t_common *common);
+void	ft_print_message(t_philo *philo, char *message);
 int		ft_init_common(int argc, char *argv[], t_common **common);
-int		ft_init_semaphore_philo(t_philo *philo);
-int		ft_init_semaphore(t_common **common);
+void	ft_generate_sem_name(const char *base, int id, char *buffer, int i, int j);
 
 #endif

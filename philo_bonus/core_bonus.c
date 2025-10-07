@@ -1,147 +1,126 @@
 #include "philosophers_bonus.h"
 
-void ft_clear_semaphore(t_common *common)
+static void	ft_exit_all(pid_t *pids, int size)
 {
-	sem_close(common->sem_forks);
-	sem_unlink(SEM_FORKS);
-}
-
-void ft_clear_semaphore_philo(t_philo *philo)
-{
-	sem_close(philo->sem_last_meal);
-	sem_close(philo->sem_number_time_eat);
-	sem_unlink(SEM_LAST_MEAL);
-	sem_unlink(SEM_NUMBER_TIME_EAT);
-}
-
-void ft_exit_all(pid_t *pids, int size)
-{
-	int i;
+	int	i;
 
 	i = 0;
 	while (i < size)
 	{
-		kill(pids[i], SIGKILL);
+		if (pids[i] > 0)
+			kill(pids[i], SIGKILL);
 		i++;
 	}
-	while (wait(NULL) > 0)
-		;
 }
 
-void	ft_eating(t_philo *philo)
+static void	ft_eating(t_philo *philo)
 {
+	sem_wait(philo->common->sem_butler);
 	sem_wait(philo->common->sem_forks);
 	ft_print_message(philo, "has taken a fork");
-	if (philo->common->number_of_philosophers > 1)
-	{
-		sem_wait(philo->common->sem_forks);
-		ft_print_message(philo, "has taken a fork");
-	}
-	sem_wait(philo->sem_last_meal);
-	philo->last_meal = ft_get_time_ms();
-	sem_post(philo->sem_last_meal);
-	sem_wait(philo->sem_number_time_eat);
-	philo->number_time_eat++;
-	sem_post(philo->sem_number_time_eat);
+	sem_wait(philo->common->sem_forks);
+	ft_print_message(philo, "has taken a fork");
+	sem_post(philo->common->sem_butler);
 	ft_print_message(philo, "is eating");
+	sem_wait(philo->data_sem);
+	philo->last_meal = ft_get_time_ms();
+	philo->number_time_eat++;
+	sem_post(philo->data_sem);
 	usleep(philo->common->time_to_eat * 1000);
-	if (philo->common->number_of_philosophers > 1)
-		sem_post(philo->common->sem_forks);
-	sem_post(philo->common->sem_forks);	
+	sem_post(philo->common->sem_forks);
+	sem_post(philo->common->sem_forks);
 }
 
-void *ft_monitor(void *args)
+static void	*ft_monitor(void *args)
 {
-	int		fed;
 	t_philo	*philo;
-	long	time_to_die;
-	int		should_shutdown;
-	long	times_eaten;
+	int		is_satiated;
 
-	philo = (t_philo *) args;
+	philo = (t_philo *)args;
 	while (1)
 	{
-		sem_wait(philo->sem_last_meal);
-		time_to_die = philo->common->time_to_die;
-		should_shutdown = ft_get_time_ms() > philo->last_meal + time_to_die;
-		sem_post(philo->sem_last_meal);
-		if (should_shutdown)
-		{
-			ft_clear_semaphore_philo(philo);
-			exit(1);
-		}
-		fed = 0;
-		sem_wait(philo->sem_number_time_eat);
+		sem_wait(philo->data_sem);
+		is_satiated = 0;
 		if (philo->common->number_of_times_must_eat != -1)
 		{
-			times_eaten = philo->number_time_eat;
-			fed = times_eaten >= philo->common->number_of_times_must_eat;
+			if (philo->number_time_eat >= philo->common->number_of_times_must_eat)
+				is_satiated = 1;
 		}
-		sem_post(philo->sem_number_time_eat);
-		if (fed)
+		else if (ft_get_time_ms() - philo->last_meal > philo->common->time_to_die)
 		{
-			ft_clear_semaphore_philo(philo);
-			exit(0);
+			sem_wait(philo->common->sem_print);
+			if (philo->common->number_of_times_must_eat == -1)
+			{
+				printf("%ld %d died\n", ft_get_time_ms() - philo->common->start_time,
+					philo->id_philo + 1);
+				exit(1);
+			}
+			sem_post(philo->common->sem_print);
 		}
+		sem_post(philo->data_sem);
+		if (is_satiated)
+			exit(0);
 		usleep(1000);
 	}
+	exit(0);
 	return (NULL);
 }
 
-void ft_children(t_common *common, int id)
+static void	ft_children(t_common *common, int id)
 {
-	t_philo philo;
-	pthread_t thr_monitor;
+	t_philo	philo;
 
-	philo = (t_philo) {id, ft_get_time_ms(), 0, NULL, NULL, common};
-	ft_init_semaphore_philo(&philo);
-	pthread_create(&thr_monitor, NULL, &ft_monitor, &philo);
+	philo = (t_philo){0};
+	philo.id_philo = id;
+	philo.common = common;
+	philo.last_meal = ft_get_time_ms();
+	ft_generate_sem_name(SEM_DATA_BASE, id, philo.data_sem_name, 0, 0);
+	sem_unlink(philo.data_sem_name);
+	philo.data_sem = sem_open(philo.data_sem_name, O_CREAT, 0644, 1);
+	pthread_create(&philo.monitor_thread, NULL, &ft_monitor, &philo);
+	if (philo.id_philo % 2)
+		usleep(philo.common->time_to_eat / 2);
 	while (1)
 	{
 		ft_eating(&philo);
 		ft_print_message(&philo, "is sleeping");
 		usleep(philo.common->time_to_sleep * 1000);
 		ft_print_message(&philo, "is thinking");
-		usleep(100);
 	}
-	if (philo.common->shutdown)
-		ft_print_message(&philo, "died");
-	pthread_join(thr_monitor, NULL);
-	exit(0);
 }
 
-int ft_wait_children(t_common *common)
+static void	ft_finish(t_common *common, pid_t *pids)
 {
-	int	died;
-	int	status;
-	int	end_children;
-	pid_t	pid_children;
+	int		finished_count;
+	int		death_occured;
+	int		status;
 
-	died = 0;
-	end_children = 0;
-	while (end_children < common->number_of_philosophers)
+	finished_count = 0;
+	death_occured = 0;
+	while (finished_count < common->number_of_philosophers)
 	{
-		pid_children = waitpid(-1, &status, 0);
-		if (pid_children <= 0)
-			break ;
-		end_children++;
-		if (WIFEXITED(status))
+		if (waitpid(-1, &status, 0) <= 0)
+			continue ;
+		finished_count++;
+		if (WIFEXITED(status) && WEXITSTATUS(status) == 1)
 		{
-			if (WEXITSTATUS(status) != 0)
-				died = 1;
-		}
-		else
-			died = 1;
-		if (died)
+			death_occured = 1;
 			break ;
+		}
 	}
-	return (died);
+	if (death_occured)
+		ft_exit_all(pids, common->number_of_philosophers);
+	while (wait(NULL) > 0)
+		;
+	sem_unlink(SEM_FORKS);
+	sem_unlink(SEM_PRINT);
+	sem_unlink(SEM_BUTLER);
 }
 
-void ft_start(t_common *common)
+void	ft_start(t_common *common)
 {
-	int i;
-	pid_t *pids;
+	int		i;
+	pid_t	*pids;
 
 	pids = malloc(common->number_of_philosophers * sizeof(pid_t));
 	if (!pids)
@@ -150,18 +129,13 @@ void ft_start(t_common *common)
 	while (i < common->number_of_philosophers)
 	{
 		pids[i] = fork();
-		if (pids[i] == -1)
-		{
-			free(pids);
-			break ;
-		}
 		if (pids[i] == 0)
 			ft_children(common, i);
+		if (pids[i] < 0)
+			break ;
 		i++;
-		usleep(1000);
 	}
-	if (ft_wait_children(common))
-		ft_exit_all(pids, common->number_of_philosophers);
-	ft_clear_semaphore(common);
+	ft_finish(common, pids);
 	free(pids);
 }
+
