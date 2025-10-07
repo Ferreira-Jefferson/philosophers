@@ -1,2 +1,4 @@
 *.o
 a.out
+./philo
+./philo_bonus

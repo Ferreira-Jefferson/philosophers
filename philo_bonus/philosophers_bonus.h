@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/06 14:18:38 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/06 17:12:08 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,19 +40,25 @@ typedef struct s_common {
 	int		shutdown;
 	long	start_time;
 	sem_t	*sem_forks;
+	sem_t	*sem_print;
 }	t_common;
 
 typedef struct s_philo {
-	int				id_philo;
-	long			last_meal;
-	long			number_time_eat;
-	t_common		*common;
+	int			id_philo;
+	long		last_meal;
+	long		number_time_eat;
+	sem_t		*sem_last_meal;
+	sem_t		*sem_number_time_eat;
+	t_common	*common;
 }	t_philo;
 
 # define INT_MIN -2147483648
 # define INT_MAX 2147483647
 
 # define SEM_FORKS "/FORKS"
+# define SEM_PRINT "/PRINT"
+# define SEM_LAST_MEAL "/LAST_MEAL"
+# define SEM_NUMBER_TIME_EAT "/NUMBER_TIME_EAT"
 
 // libft_bonus.c
 int		ft_isdigit(int c);
@@ -72,10 +78,12 @@ void	ft_start(t_common *common);
 // void	ft_eating(t_philo *philo);
 
 // utils_bonus.c
-void	ft_print_message(t_philo philo, char *message);
+void	ft_print_message(t_philo *philo, char *message);
 long	ft_get_time_ms(void);
 
 // utils_init_bonus.c
 int		ft_init_common(int argc, char *argv[], t_common **common);
+int		ft_init_semaphore_philo(t_philo *philo);
+int		ft_init_semaphore(t_common **common);
 
 #endif

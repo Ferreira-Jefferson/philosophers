@@ -6,6 +6,14 @@ void ft_clear_semaphore(t_common *common)
 	sem_unlink(SEM_FORKS);
 }
 
+void ft_clear_semaphore_philo(t_philo *philo)
+{
+	sem_close(philo->sem_last_meal);
+	sem_close(philo->sem_number_time_eat);
+	sem_unlink(SEM_LAST_MEAL);
+	sem_unlink(SEM_NUMBER_TIME_EAT);
+}
+
 void ft_exit_all(pid_t *pids, int size)
 {
 	int i;
@@ -16,65 +24,118 @@ void ft_exit_all(pid_t *pids, int size)
 		kill(pids[i], SIGKILL);
 		i++;
 	}
-}
-
-int	ft_should_shutdown(t_philo *philo)
-{
-	int		fed;
-	int		should_shutdown;
-	long	times_eaten;
-	long	time_to_die;
-
-	time_to_die = philo->common->time_to_die;
-	should_shutdown = ft_get_time_ms() > philo->last_meal + time_to_die;
-	fed = 0;
-	if (philo->common->number_of_times_must_eat != -1)
-	{
-		should_shutdown = 0;
-		times_eaten = philo->number_time_eat;
-		fed = times_eaten >= philo->common->number_of_times_must_eat;
-	}
-	philo->common->shutdown = should_shutdown;
-	return (should_shutdown || fed);
+	while (wait(NULL) > 0)
+		;
 }
 
 void	ft_eating(t_philo *philo)
 {
 	sem_wait(philo->common->sem_forks);
-	ft_print_message(*philo, "has taken a fork");
+	ft_print_message(philo, "has taken a fork");
 	if (philo->common->number_of_philosophers > 1)
 	{
 		sem_wait(philo->common->sem_forks);
-		ft_print_message(*philo, "has taken a fork");
+		ft_print_message(philo, "has taken a fork");
 	}
+	sem_wait(philo->sem_last_meal);
 	philo->last_meal = ft_get_time_ms();
+	sem_post(philo->sem_last_meal);
+	sem_wait(philo->sem_number_time_eat);
 	philo->number_time_eat++;
-	ft_print_message(*philo, "is eating");
+	sem_post(philo->sem_number_time_eat);
+	ft_print_message(philo, "is eating");
 	usleep(philo->common->time_to_eat * 1000);
 	if (philo->common->number_of_philosophers > 1)
 		sem_post(philo->common->sem_forks);
 	sem_post(philo->common->sem_forks);	
 }
 
+void *ft_monitor(void *args)
+{
+	int		fed;
+	t_philo	*philo;
+	long	time_to_die;
+	int		should_shutdown;
+	long	times_eaten;
+
+	philo = (t_philo *) args;
+	while (1)
+	{
+		sem_wait(philo->sem_last_meal);
+		time_to_die = philo->common->time_to_die;
+		should_shutdown = ft_get_time_ms() > philo->last_meal + time_to_die;
+		sem_post(philo->sem_last_meal);
+		if (should_shutdown)
+		{
+			ft_clear_semaphore_philo(philo);
+			exit(1);
+		}
+		fed = 0;
+		sem_wait(philo->sem_number_time_eat);
+		if (philo->common->number_of_times_must_eat != -1)
+		{
+			times_eaten = philo->number_time_eat;
+			fed = times_eaten >= philo->common->number_of_times_must_eat;
+		}
+		sem_post(philo->sem_number_time_eat);
+		if (fed)
+		{
+			ft_clear_semaphore_philo(philo);
+			exit(0);
+		}
+		usleep(1000);
+	}
+	return (NULL);
+}
+
 void ft_children(t_common *common, int id)
 {
 	t_philo philo;
+	pthread_t thr_monitor;
 
-	philo = (t_philo) {id, ft_get_time_ms(), 0, common};
-	while (!ft_should_shutdown(&philo))
+	philo = (t_philo) {id, ft_get_time_ms(), 0, NULL, NULL, common};
+	ft_init_semaphore_philo(&philo);
+	pthread_create(&thr_monitor, NULL, &ft_monitor, &philo);
+	while (1)
 	{
 		ft_eating(&philo);
-		if (!ft_should_shutdown(&philo))
-		{
-			ft_print_message(philo, "is sleeping");
-			usleep(philo.common->time_to_sleep * 1000);
-		}
-		if (!ft_should_shutdown(&philo))
-			ft_print_message(philo, "is thinking");
+		ft_print_message(&philo, "is sleeping");
+		usleep(philo.common->time_to_sleep * 1000);
+		ft_print_message(&philo, "is thinking");
+		usleep(100);
 	}
 	if (philo.common->shutdown)
-		ft_print_message(philo, "died");
+		ft_print_message(&philo, "died");
+	pthread_join(thr_monitor, NULL);
 	exit(0);
+}
+
+int ft_wait_children(t_common *common)
+{
+	int	died;
+	int	status;
+	int	end_children;
+	pid_t	pid_children;
+
+	died = 0;
+	end_children = 0;
+	while (end_children < common->number_of_philosophers)
+	{
+		pid_children = waitpid(-1, &status, 0);
+		if (pid_children <= 0)
+			break ;
+		end_children++;
+		if (WIFEXITED(status))
+		{
+			if (WEXITSTATUS(status) != 0)
+				died = 1;
+		}
+		else
+			died = 1;
+		if (died)
+			break ;
+	}
+	return (died);
 }
 
 void ft_start(t_common *common)
@@ -99,8 +160,8 @@ void ft_start(t_common *common)
 		i++;
 		usleep(1000);
 	}
-	wait(NULL);
-	ft_exit_all(pids, i);
-	free(pids);
+	if (ft_wait_children(common))
+		ft_exit_all(pids, common->number_of_philosophers);
 	ft_clear_semaphore(common);
+	free(pids);
 }
