@@ -1,4 +1,4 @@
-# Philosophers (philo / philo_bonus)
+# Philosophers
 
 This repository contains the 42 School "Dining Philosophers" project. It includes two implementations:
 
