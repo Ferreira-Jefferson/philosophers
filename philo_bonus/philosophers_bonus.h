@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:20:54 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:47:49 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,7 +17,6 @@
 # include <stdio.h>
 # include <stdlib.h>
 # include <unistd.h>
-# include <signal.h>
 # include <pthread.h>
 # include <semaphore.h>
 # include <sys/time.h>
