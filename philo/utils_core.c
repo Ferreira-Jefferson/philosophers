@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/07 18:12:41 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 14:35:58 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,12 +47,6 @@ void	ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork)
 	id = philo->id_philo;
 	*left_fork = id;
 	*right_fork = (id + 1) % philo->common->number_of_philosophers;
-	if (*left_fork > *right_fork)
-	{
-		*right_fork = *left_fork ^ *right_fork;
-		*left_fork = *left_fork ^ *right_fork;
-		*right_fork = *left_fork ^ *right_fork;
-	}
 }
 
 int	ft_should_shutdown(t_philo *philo)
