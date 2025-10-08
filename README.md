@@ -13,7 +13,6 @@ The goal is to simulate N philosophers that alternately think, eat and sleep. Ea
 - [Project structure](#project-structure)
 - [Behavior and rules](#behavior-and-rules)
 - [Usage](#usage)
-- [Compiling](#compiling)
 - [Testing examples](#testing-examples)
 - [Makefile targets](#makefile-targets)
 - [License](#license)
@@ -90,10 +89,18 @@ The timestamp is the time since the simulation start.
 
 ## Usage
 
-Build from the repository root:
+Clone the repository:
 
 ```bash
-make
+git clone https://github.com/Ferreira-Jefferson/philosophers.git
+cd philosophers
+```
+
+Create the executable:
+
+```bash
+cd philo && make
+cd ../philo_bonus && make
 ```
 
 Run the mandatory (threaded) version (note the `cd` into the folder before running):
@@ -122,27 +129,6 @@ Notes:
 - Use `Ctrl+C` to stop a long-running or stuck simulation. The programs should also terminate by themselves when the stopping condition is met.
 - The exact binaries are created inside `philo/` and `philo_bonus/` after running `make` in the project root or in each subfolder.
 
-## Compiling
-
-The repository includes `Makefile`s in each implementation directory. From the project root, run:
-
-```bash
-make
-```
-
-Common Makefile targets:
-
-- `all` or default — compile the program(s).
-- `clean` — remove object files.
-- `fclean` — remove object files and executables.
-- `re` — `fclean` then `all`.
-
-If you want to build only one implementation run `make` inside its folder:
-
-```bash
-cd philo && make
-cd ../philo_bonus && make
-```
 
 ## Testing examples
 
