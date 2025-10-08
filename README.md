@@ -9,14 +9,14 @@ The goal is to simulate N philosophers that alternately think, eat and sleep. Ea
 
 ## Table of contents
 
-- About
-- Project structure
-- Behavior and rules
-- Usage
-- Compiling
-- Testing examples
-- Makefile targets
-- License
+- [About](#about)
+- [Project structure](#project-structure)
+- [Behavior and rules](#behavior-and-rules)
+- [Usage](#usage)
+- [Compiling](#compiling)
+- [Testing examples](#testing-examples)
+- [Makefile targets](#makefile-targets)
+- [License](#license)
 
 ## About
 
