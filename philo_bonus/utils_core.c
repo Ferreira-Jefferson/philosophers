@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 10:19:02 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:21:35 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:35:13 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,7 +53,6 @@ void	ft_verity_death_by_time(t_philo *philo)
 	sleep_ms = philo->common->time_to_sleep;
 	while (slept < sleep_ms)
 	{
-		usleep(1000);
 		slept++;
 		sem_wait(philo->data_sem);
 		if (ft_get_time_ms() - philo->last_meal > philo->common->time_to_die)

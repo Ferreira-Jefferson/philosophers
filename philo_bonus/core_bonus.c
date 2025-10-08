@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:14:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:44:24 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 16:23:56 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,7 +19,6 @@ static void	ft_eating(t_philo *philo)
 	ft_print_message(philo, "has taken a fork");
 	sem_wait(philo->common->sem_forks);
 	ft_print_message(philo, "has taken a fork");
-	sem_post(philo->common->sem_butler);
 	ft_print_message(philo, "is eating");
 	sem_wait(philo->data_sem);
 	philo->last_meal = ft_get_time_ms();
@@ -28,6 +27,7 @@ static void	ft_eating(t_philo *philo)
 	usleep(philo->common->time_to_eat * 1000);
 	sem_post(philo->common->sem_forks);
 	sem_post(philo->common->sem_forks);
+	sem_post(philo->common->sem_butler);
 }
 
 static void	ft_core(t_philo *philo)
@@ -36,18 +36,16 @@ static void	ft_core(t_philo *philo)
 	{
 		ft_eating(philo);
 		if (philo->common->number_of_times_must_eat != -1)
-		{
 			ft_verity_death_by_saciety(philo);
-			ft_print_message(philo, "is sleeping");
-			usleep(philo->common->time_to_sleep * 1000);
-			ft_print_message(philo, "is thinking");
-		}
 		else
-		{
-			ft_print_message(philo, "is sleeping");
 			ft_verity_death_by_time(philo);
-			ft_print_message(philo, "is thinking");
-		}
+		ft_print_message(philo, "is sleeping");
+		usleep(philo->common->time_to_sleep * 1000);
+		if (philo->common->number_of_times_must_eat != -1)
+			ft_verity_death_by_saciety(philo);
+		else
+			ft_verity_death_by_time(philo);
+		ft_print_message(philo, "is thinking");
 	}
 }
 
@@ -62,8 +60,6 @@ static void	ft_children(t_common *common, int id)
 	ft_generate_sem_name(SEM_DATA_BASE, id, philo.data_sem_name);
 	sem_unlink(philo.data_sem_name);
 	philo.data_sem = sem_open(philo.data_sem_name, O_CREAT, 0644, 1);
-	if (philo.id_philo % 2)
-		usleep(philo.common->time_to_eat);
 	ft_core(&philo);
 }
 
