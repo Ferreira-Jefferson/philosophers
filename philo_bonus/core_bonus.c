@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:14:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:36:59 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 10:44:24 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,7 +63,7 @@ static void	ft_children(t_common *common, int id)
 	sem_unlink(philo.data_sem_name);
 	philo.data_sem = sem_open(philo.data_sem_name, O_CREAT, 0644, 1);
 	if (philo.id_philo % 2)
-		usleep(philo.common->time_to_eat / 2);
+		usleep(philo.common->time_to_eat);
 	ft_core(&philo);
 }
 
