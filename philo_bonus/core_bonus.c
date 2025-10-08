@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:14:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:20:44 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 10:36:59 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,27 @@ static void	ft_eating(t_philo *philo)
 	sem_post(philo->common->sem_forks);
 }
 
+static void	ft_core(t_philo *philo)
+{
+	while (1)
+	{
+		ft_eating(philo);
+		if (philo->common->number_of_times_must_eat != -1)
+		{
+			ft_verity_death_by_saciety(philo);
+			ft_print_message(philo, "is sleeping");
+			usleep(philo->common->time_to_sleep * 1000);
+			ft_print_message(philo, "is thinking");
+		}
+		else
+		{
+			ft_print_message(philo, "is sleeping");
+			ft_verity_death_by_time(philo);
+			ft_print_message(philo, "is thinking");
+		}
+	}
+}
+
 static void	ft_children(t_common *common, int id)
 {
 	t_philo	philo;
@@ -43,14 +64,7 @@ static void	ft_children(t_common *common, int id)
 	philo.data_sem = sem_open(philo.data_sem_name, O_CREAT, 0644, 1);
 	if (philo.id_philo % 2)
 		usleep(philo.common->time_to_eat / 2);
-	while (1)
-	{
-		ft_eating(&philo);
-		ft_verity_death_by_saciety(&philo);
-		ft_print_message(&philo, "is sleeping");
-		ft_verity_death_by_time(&philo);
-		ft_print_message(&philo, "is thinking");
-	}
+	ft_core(&philo);
 }
 
 static void	ft_finish(t_common *common, pid_t *pids)
