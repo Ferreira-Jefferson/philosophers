@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 09:46:48 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 10:20:54 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,5 +70,8 @@ void	ft_close_all(t_common *common);
 void	ft_print_message(t_philo *philo, char *message);
 int		ft_init_common(int argc, char *argv[], t_common **common);
 void	ft_generate_sem_name(const char *base, int id, char *buffer);
+void	ft_exit_all(pid_t *pids, t_common *common);
+void	ft_verity_death_by_saciety(t_philo *philo);
+void	ft_verity_death_by_time(t_philo *philo);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:25:29 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:04:13 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 10:22:56 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,24 @@ static void	ft_is_satiated(t_philo *philo)
 	}
 }
 
+static void	ft_verify_death(t_philo *philo)
+{
+	sem_wait(philo->common->sem_print);
+	if (philo->common->number_of_times_must_eat == -1)
+	{
+		printf("%ld %d died\n", \
+			ft_get_time_ms() - philo->common->start_time, \
+			philo->id_philo + 1);
+		if (philo->data_sem && philo->data_sem != SEM_FAILED)
+			sem_close(philo->data_sem);
+		sem_unlink(philo->data_sem_name);
+		ft_close_all(philo->common);
+		free(philo->common);
+		exit(1);
+	}
+	sem_post(philo->common->sem_print);
+}
+
 void	*ft_monitor(void *args)
 {
 	t_philo	*philo;
@@ -42,21 +60,7 @@ void	*ft_monitor(void *args)
 		else if (ft_get_time_ms() - philo->last_meal > \
 			philo->common->time_to_die)
 		{
-			sem_wait(philo->common->sem_print);
-			if (philo->common->number_of_times_must_eat == -1)
-			{
-				printf("%ld %d died\n", \
-					ft_get_time_ms() - philo->common->start_time, \
-					philo->id_philo + 1);
-				if (philo->data_sem && philo->data_sem != SEM_FAILED)
-					sem_close(philo->data_sem);
-				sem_unlink(philo->data_sem_name);
-				ft_close_all(philo->common);
-				/* child's copy of common was allocated by parent before fork; free it here */
-				free(philo->common);
-				exit(1);
-			}
-			sem_post(philo->common->sem_print);
+			ft_verify_death(philo);
 		}
 		sem_post(philo->data_sem);
 		usleep(1000);

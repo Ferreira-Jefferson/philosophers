@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:27:39 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 10:01:58 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 10:10:56 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,10 +70,10 @@ long	ft_get_time_ms(void)
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-void ft_close_all(t_common *common)
+void	ft_close_all(t_common *common)
 {
 	if (!common)
-		return;
+		return ;
 	if (common->sem_forks && common->sem_forks != SEM_FAILED)
 	{
 		sem_close(common->sem_forks);
@@ -89,7 +89,6 @@ void ft_close_all(t_common *common)
 		sem_close(common->sem_butler);
 		common->sem_butler = SEM_FAILED;
 	}
-	/* unlinking named semaphores is idempotent */
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_BUTLER);
