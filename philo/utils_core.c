@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/03 16:00:00 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/07 18:12:41 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,8 +67,8 @@ int	ft_should_shutdown(t_philo *philo)
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	times_eaten = philo->number_time_eat;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
-	fed = (philo->common->number_of_times_must_eat != -1 && 
-	       times_eaten >= philo->common->number_of_times_must_eat);
+	fed = (philo->common->number_of_times_must_eat != -1 \
+		&& times_eaten >= philo->common->number_of_times_must_eat);
 	return (should_shutdown || fed);
 }
 
@@ -77,21 +77,19 @@ void	ft_eating(t_philo *philo)
 	int	left_fork;
 	int	right_fork;
 
+	if (ft_should_shutdown(philo))
+		return ;
 	ft_get_forks_id(philo, &left_fork, &right_fork);
 	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
 	ft_print_message(philo, "has taken a fork");
-	if (philo->common->number_of_philosophers > 1)
-	{
-		pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
-		ft_print_message(philo, "has taken a fork");
-	}
+	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
+	ft_print_message(philo, "has taken a fork");
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = ft_get_time_ms();
 	philo->number_time_eat++;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
 	ft_print_message(philo, "is eating");
 	usleep(philo->common->time_to_eat * 1000);
-	if (philo->common->number_of_philosophers > 1)
-		pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
+	pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
 	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
 }

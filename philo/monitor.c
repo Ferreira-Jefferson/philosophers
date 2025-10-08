@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:05 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/03 16:00:00 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 07:48:25 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,22 +15,15 @@
 static int	ft_verify_death(t_philo *philo)
 {
 	long	last_meal_time;
-	long	current_time;
-	int		is_dead;
 
 	pthread_mutex_lock(&philo->common->shutdown_mutex);
 	if (philo->common->shutdown)
-	{
-		pthread_mutex_unlock(&philo->common->shutdown_mutex);
-		return (1);
-	}
+		return (pthread_mutex_unlock(&philo->common->shutdown_mutex) + 1);
 	pthread_mutex_unlock(&philo->common->shutdown_mutex);
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	last_meal_time = philo->last_meal;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
-	current_time = ft_get_time_ms();
-	is_dead = (current_time - last_meal_time) > philo->common->time_to_die;
-	if (is_dead)
+	if ((ft_get_time_ms() - last_meal_time) > philo->common->time_to_die)
 	{
 		pthread_mutex_lock(&philo->common->shutdown_mutex);
 		if (!philo->common->shutdown)
@@ -55,17 +48,13 @@ static int	ft_check_all_fed(t_philo *philos, int num_philos)
 		return (0);
 	all_fed = 1;
 	i = 0;
-	while (i < num_philos)
+	while (all_fed && i < num_philos)
 	{
 		pthread_mutex_lock(&philos[i].last_meal_mutex);
 		times_eaten = philos[i].number_time_eat;
 		pthread_mutex_unlock(&philos[i].last_meal_mutex);
-
 		if (times_eaten < philos[0].common->number_of_times_must_eat)
-		{
 			all_fed = 0;
-			break;
-		}
 		i++;
 	}
 	if (all_fed)
@@ -89,16 +78,18 @@ void	*ft_monitor(void *args)
 	while (1)
 	{
 		i = 0;
-		while (i < number_of_philos)
+		if (philos[0].common->number_of_times_must_eat == -1)
 		{
-			if (ft_verify_death(&philos[i]))
-				return (NULL);
-			i++;
+			while (i < number_of_philos)
+			{
+				if (ft_verify_death(&philos[i]))
+					return (NULL);
+				i++;
+			}
 		}
-		if (ft_check_all_fed(philos, number_of_philos))
+		else if (ft_check_all_fed(philos, number_of_philos))
 			return (NULL);
 		usleep(500);
 	}
 	return (NULL);
-	
 }

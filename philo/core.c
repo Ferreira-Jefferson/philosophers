@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:11:45 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/03 16:00:00 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 08:13:16 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,7 @@ void	ft_start(t_common **common)
 		return ;
 	thr_philos = (pthread_t *) malloc(quantity * sizeof(pthread_t));
 	if (!thr_philos)
-	{
-		free(philos);
-		return ;
-	}
+		return (free(philos));
 	ft_create(thr_philos, &thr_monitor, philos, *common);
 	ft_join(quantity, thr_philos, &thr_monitor);
 	i = 0;
@@ -48,7 +45,6 @@ void	*ft_core(void *args)
 	t_philo	*philo;
 
 	philo = (t_philo *) args;
-
 	if (philo->id_philo % 2 == 1)
 		usleep(100);
 	while (!ft_should_shutdown(philo))

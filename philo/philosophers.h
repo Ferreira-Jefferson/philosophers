@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 14:54:25 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/08 08:09:47 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,9 +56,6 @@ typedef struct s_philo {
 int		ft_isdigit(int c);
 int		ft_is_only_number(char *str);
 int		ft_atoi(const char *nptr);
-
-// phipholophers.c
-int		ft_validation(int argc, char *argv[]);
 
 // monitor.c
 void	*ft_monitor(void *args);
