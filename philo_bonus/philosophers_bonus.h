@@ -1,3 +1,15 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   philosophers_bonus.h                               :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
+/*   Updated: 2025/10/08 09:46:48 by jtertuli         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef PHILOSOPHERS_BONUS_H
 # define PHILOSOPHERS_BONUS_H
 
@@ -49,11 +61,14 @@ typedef struct s_philo {
 	t_common		*common;
 }	t_philo;
 
-int		ft_atoi(const char *nptr);
 long	ft_get_time_ms(void);
+void	*ft_monitor(void *args);
+int		ft_atoi(const char *nptr);
 void	ft_start(t_common *common);
+int		ft_is_only_number(char *str);
+void	ft_close_all(t_common *common);
 void	ft_print_message(t_philo *philo, char *message);
 int		ft_init_common(int argc, char *argv[], t_common **common);
-void	ft_generate_sem_name(const char *base, int id, char *buffer, int i, int j);
+void	ft_generate_sem_name(const char *base, int id, char *buffer);
 
 #endif
