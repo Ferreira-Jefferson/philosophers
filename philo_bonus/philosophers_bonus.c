@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:27:09 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 08:17:31 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/09 14:16:18 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,8 @@ static int	ft_validation(int argc, char *argv[])
 {
 	int	i;
 
+	if (argc == 1)
+		return (1);
 	if (argc < 5 || argc > 6)
 		return (ft_error_message(argc, argv));
 	if (ft_atoi(argv[1]) == 0)

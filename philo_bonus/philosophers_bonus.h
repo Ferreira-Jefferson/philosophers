@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 16:47:49 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/09 14:20:15 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ typedef struct s_philo {
 }	t_philo;
 
 long	ft_get_time_ms(void);
-void	*ft_monitor(void *args);
 int		ft_atoi(const char *nptr);
 void	ft_start(t_common *common);
 int		ft_is_only_number(char *str);
