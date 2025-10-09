@@ -43,7 +43,8 @@ philosophers/
 │   ├── utils_init.c
 │   ├── utils.c
 │   ├── libft.c
-│   └── philosophers.h
+│   ├── philosophers.h
+|	└── Makefile 
 ├── philo_bonus/             # bonus implementation (processes + semaphores)
 │   ├── philo_bonus           # binary after make
 │   ├── core_bonus.c
@@ -52,8 +53,8 @@ philosophers/
 │   ├── utils_core.c
 │   ├── utils_init_bonus.c
 │   ├── utils_bonus.c
-│   └── libft_bonus.c
-├── Makefile                  # top-level Makefile (may forward to subdirs)
+│   ├── libft_bonus.c
+│   └── Makefile 
 ├── LICENSE
 └── README.md
 ```
