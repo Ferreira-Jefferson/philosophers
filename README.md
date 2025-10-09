@@ -167,7 +167,7 @@ Check the `Makefile` inside `philo/` and `philo_bonus/` for exact targets and be
 
 ## License
 
-This project is distributed under the GNU GENERAL PUBLIC LICENSE. See the [LICENSE](LICENSE) file in the repository root for details.
+This project is distributed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file in the repository root for details.
 
 ---
 
