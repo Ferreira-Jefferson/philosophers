@@ -1,4 +1,7 @@
-# Philosophers
+# Philosophers - 42 School Project
+
+![Philosophers](https://img.shields.io/badge/42-Philosophers-blue?style=for-the-badge)
+![License](https://img.shields.io/badge/License-GPLv3-green?style=for-the-badge)
 
 This repository contains the 42 School "Dining Philosophers" project. It includes two implementations:
 
