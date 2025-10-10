@@ -1,40 +1,26 @@
 #include "philosophers_bonus.h"
 
-static void	ft_cleanup_and_exit(t_philo *philo, int exit_code)
-{
-	// pthread_cancel(philo->monitor_thread);
-	if (philo->data_sem && philo->data_sem != SEM_FAILED)
-		sem_close(philo->data_sem);
-	sem_unlink(philo->data_sem_name);
-	ft_close_all(philo->common);
-	free(philo->common);
-	exit(exit_code);
-}
-
 static void	*ft_monitor_death(void *arg)
 {
 	t_philo	*philo;
 	long	time_since_meal;
 
 	philo = (t_philo *)arg;
-	if (philo->common->number_of_times_must_eat == -1)
+	while (1)
 	{
-		while (1)
+		usleep(1000);
+		sem_wait(philo->data_sem);
+		time_since_meal = ft_get_time_ms() - philo->last_meal;
+		if (time_since_meal > philo->common->time_to_die)
 		{
-			usleep(1000);
-			sem_wait(philo->data_sem);
-			time_since_meal = ft_get_time_ms() - philo->last_meal;
-			if (time_since_meal > philo->common->time_to_die)
-			{
-				sem_wait(philo->common->sem_print);
-				printf("%ld %d died\n", \
-					ft_get_time_ms() - philo->common->start_time, \
-					philo->id_philo + 1);
-				sem_post(philo->data_sem);
-				ft_cleanup_and_exit(philo, 1);
-			}
+			sem_wait(philo->common->sem_print);
+			printf("%ld %d died\n", \
+				ft_get_time_ms() - philo->common->start_time, \
+				philo->id_philo + 1);
 			sem_post(philo->data_sem);
+			exit(1);
 		}
+		sem_post(philo->data_sem);
 	}
 	return (NULL);
 }
@@ -66,7 +52,7 @@ static void	ft_core(t_philo *philo)
 		ft_eating(philo);
 		if (philo->common->number_of_times_must_eat != -1 && \
 			philo->number_time_eat >= philo->common->number_of_times_must_eat)
-			ft_cleanup_and_exit(philo, 0);
+			exit(0);
 		ft_print_message(philo, "is sleeping");
 		usleep(philo->common->time_to_sleep * 1000);
 		ft_print_message(philo, "is thinking");

@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   philosophers_bonus.h                               :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/09 14:20:15 by jtertuli         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #ifndef PHILOSOPHERS_BONUS_H
 # define PHILOSOPHERS_BONUS_H
 
@@ -22,6 +10,7 @@
 # include <sys/time.h>
 # include <sys/wait.h>
 # include <fcntl.h>
+# include <signal.h>
 
 # define RED_BOLD "\033[1;31m"
 # define RED "\33[31m"
@@ -69,7 +58,5 @@ void	ft_print_message(t_philo *philo, char *message);
 int		ft_init_common(int argc, char *argv[], t_common **common);
 void	ft_generate_sem_name(const char *base, int id, char *buffer);
 void	ft_exit_all(pid_t *pids, t_common *common);
-void	ft_verity_death_by_saciety(t_philo *philo);
-void	ft_verity_death_by_time(t_philo *philo);
 
 #endif
