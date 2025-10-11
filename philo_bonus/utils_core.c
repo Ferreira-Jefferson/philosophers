@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 10:19:02 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/10 15:28:49 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/11 16:52:40 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,4 +70,45 @@ void	ft_verity_death_by_time(t_philo *philo)
 		}
 		sem_post(philo->data_sem);
 	}
+}
+
+void	ft_close_all_2(t_common *common)
+{
+	if (common->sem_death && common->sem_death != SEM_FAILED)
+	{
+		sem_close(common->sem_death);
+		common->sem_death = SEM_FAILED;
+	}
+	if (common->sem_full && common->sem_full != SEM_FAILED)
+	{
+		sem_close(common->sem_full);
+		common->sem_full = SEM_FAILED;
+	}
+}
+
+void	ft_close_all(t_common *common)
+{
+	if (!common)
+		return ;
+	if (common->sem_forks && common->sem_forks != SEM_FAILED)
+	{
+		sem_close(common->sem_forks);
+		common->sem_forks = SEM_FAILED;
+	}
+	if (common->sem_print && common->sem_print != SEM_FAILED)
+	{
+		sem_close(common->sem_print);
+		common->sem_print = SEM_FAILED;
+	}
+	if (common->sem_butler && common->sem_butler != SEM_FAILED)
+	{
+		sem_close(common->sem_butler);
+		common->sem_butler = SEM_FAILED;
+	}
+	ft_close_all_2(common);
+	sem_unlink(SEM_FORKS);
+	sem_unlink(SEM_PRINT);
+	sem_unlink(SEM_BUTLER);
+	sem_unlink(SEM_DEATH);
+	sem_unlink(SEM_FULL);
 }
