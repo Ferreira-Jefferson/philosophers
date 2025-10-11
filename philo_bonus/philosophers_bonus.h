@@ -26,6 +26,13 @@
 # define SEM_PRINT "/philo_print"
 # define SEM_BUTLER "/philo_butler"
 # define SEM_DATA_BASE "/philo_data_"
+#define SEM_DEATH "/philo_death"
+#define SEM_FORKS "/philo_forks"
+#define SEM_PRINT "/philo_print"
+#define SEM_BUTLER "/philo_butler"
+#define SEM_DATA_BASE "/philo_data_"
+#define SEM_DEATH "/philo_death"
+#define SEM_FULL "/philo_full"  // ADICIONE
 
 typedef struct s_common {
 	int				number_of_philosophers;
@@ -37,6 +44,8 @@ typedef struct s_common {
 	sem_t			*sem_forks;
 	sem_t			*sem_print;
 	sem_t			*sem_butler;
+	sem_t			*sem_death;
+	sem_t			*sem_full;  // ADICIONE - conta quantos terminaram de comer
 }	t_common;
 
 typedef struct s_philo {

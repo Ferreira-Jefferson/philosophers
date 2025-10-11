@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:27:39 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 16:38:41 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/11 13:29:09 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,19 @@ void	ft_close_all(t_common *common)
 		sem_close(common->sem_butler);
 		common->sem_butler = SEM_FAILED;
 	}
+	if (common->sem_death && common->sem_death != SEM_FAILED)
+	{
+		sem_close(common->sem_death);
+		common->sem_death = SEM_FAILED;
+	}
+	if (common->sem_full && common->sem_full != SEM_FAILED)
+	{
+		sem_close(common->sem_full);
+		common->sem_full = SEM_FAILED;
+	}
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_BUTLER);
+	sem_unlink(SEM_DEATH);
+	sem_unlink(SEM_FULL);
 }

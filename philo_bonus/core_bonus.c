@@ -1,42 +1,35 @@
 #include "philosophers_bonus.h"
 
-static void	ft_cleanup_and_exit(t_philo *philo, int exit_code)
+static int	ft_check_death(t_philo *philo)
 {
-	// pthread_cancel(philo->monitor_thread);
+	int	value;
+
+	sem_getvalue(philo->common->sem_death, &value);
+	return (value > 0);
+}
+
+static int	ft_check_all_full(t_philo *philo)
+{
+	int	value;
+
+	if (philo->common->number_of_times_must_eat == -1)
+		return (0);
+	sem_getvalue(philo->common->sem_full, &value);
+	return (value >= philo->common->number_of_philosophers);
+}
+
+static void	ft_announce_death(t_philo *philo)
+{
+	sem_wait(philo->common->sem_print);
+	printf("%ld %d died\n", 
+		ft_get_time_ms() - philo->common->start_time, 
+		philo->id_philo + 1);	
 	if (philo->data_sem && philo->data_sem != SEM_FAILED)
 		sem_close(philo->data_sem);
 	sem_unlink(philo->data_sem_name);
 	ft_close_all(philo->common);
 	free(philo->common);
-	exit(exit_code);
-}
-
-static void	*ft_monitor_death(void *arg)
-{
-	t_philo	*philo;
-	long	time_since_meal;
-
-	philo = (t_philo *)arg;
-	if (philo->common->number_of_times_must_eat == -1)
-	{
-		while (1)
-		{
-			usleep(1000);
-			sem_wait(philo->data_sem);
-			time_since_meal = ft_get_time_ms() - philo->last_meal;
-			if (time_since_meal > philo->common->time_to_die)
-			{
-				sem_wait(philo->common->sem_print);
-				printf("%ld %d died\n", \
-					ft_get_time_ms() - philo->common->start_time, \
-					philo->id_philo + 1);
-				sem_post(philo->data_sem);
-				ft_cleanup_and_exit(philo, 1);
-			}
-			sem_post(philo->data_sem);
-		}
-	}
-	return (NULL);
+	exit(1);
 }
 
 static void	ft_eating(t_philo *philo)
@@ -57,18 +50,73 @@ static void	ft_eating(t_philo *philo)
 	sem_post(philo->common->sem_butler);
 }
 
-static void	ft_core(t_philo *philo)
+static void	ft_sleeping(t_philo *philo)
 {
-	pthread_create(&philo->monitor_thread, NULL, ft_monitor_death, philo);
-	pthread_detach(philo->monitor_thread);
+	long	start_sleep;
+	long	elapsed;
+
+	ft_print_message(philo, "is sleeping");
+	start_sleep = ft_get_time_ms();
 	while (1)
 	{
+		if (ft_check_death(philo) || ft_check_all_full(philo))
+			exit(0);
+		
+		elapsed = ft_get_time_ms() - start_sleep;
+		if (elapsed >= philo->common->time_to_sleep)
+			break;
+		
+		// SÓ VERIFICA MORTE SE NÃO TEM LIMITE DE REFEIÇÕES
+		if (philo->common->number_of_times_must_eat == -1)
+		{
+			sem_wait(philo->data_sem);
+			if (ft_get_time_ms() - philo->last_meal > philo->common->time_to_die)
+			{
+				sem_post(philo->data_sem);
+				ft_announce_death(philo);
+			}
+			sem_post(philo->data_sem);
+		}
+		usleep(1000);
+	}
+}
+
+static void	ft_core(t_philo *philo)
+{
+	// Offset para filósofos pares evitarem deadlock
+	if (philo->id_philo % 2 == 0)
+		usleep(philo->common->time_to_eat * 500);
+	
+	while (1)
+	{
+		if (ft_check_death(philo) || ft_check_all_full(philo))
+			exit(0);
+		
 		ft_eating(philo);
-		if (philo->common->number_of_times_must_eat != -1 && \
+		
+		// Verifica se já comeu o suficiente
+		if (philo->common->number_of_times_must_eat != -1 && 
 			philo->number_time_eat >= philo->common->number_of_times_must_eat)
-			ft_cleanup_and_exit(philo, 0);
-		ft_print_message(philo, "is sleeping");
-		usleep(philo->common->time_to_sleep * 1000);
+		{
+			sem_post(philo->common->sem_full);  // Sinaliza que terminou
+			
+			// Aguarda até que TODOS terminem
+			while (!ft_check_all_full(philo))
+				usleep(1000);
+			
+			if (philo->data_sem && philo->data_sem != SEM_FAILED)
+				sem_close(philo->data_sem);
+			sem_unlink(philo->data_sem_name);
+			ft_close_all(philo->common);
+			free(philo->common);
+			exit(0);
+		}
+		
+		ft_sleeping(philo);
+		
+		if (ft_check_death(philo) || ft_check_all_full(philo))
+			exit(0);
+		
 		ft_print_message(philo, "is thinking");
 	}
 }
