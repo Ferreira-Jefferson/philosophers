@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 14:35:58 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/11 13:49:26 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,24 +66,42 @@ int	ft_should_shutdown(t_philo *philo)
 	return (should_shutdown || fed);
 }
 
-void	ft_eating(t_philo *philo)
+void ft_eating(t_philo *philo)
 {
 	int	left_fork;
 	int	right_fork;
+	int	first_fork;
+	int	second_fork;
 
 	if (ft_should_shutdown(philo))
 		return ;
 	ft_get_forks_id(philo, &left_fork, &right_fork);
-	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
+
+	/* lock in consistent order: smaller index first */
+	if (left_fork < right_fork)
+	{
+		first_fork = left_fork;
+		second_fork = right_fork;
+	}
+	else
+	{
+		first_fork = right_fork;
+		second_fork = left_fork;
+	}
+
+	pthread_mutex_lock(&philo->common->forks_mutex[first_fork]);
 	ft_print_message(philo, "has taken a fork");
-	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
+	pthread_mutex_lock(&philo->common->forks_mutex[second_fork]);
 	ft_print_message(philo, "has taken a fork");
+
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = ft_get_time_ms();
 	philo->number_time_eat++;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
+
 	ft_print_message(philo, "is eating");
 	usleep(philo->common->time_to_eat * 1000);
-	pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
-	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
+
+	pthread_mutex_unlock(&philo->common->forks_mutex[second_fork]);
+	pthread_mutex_unlock(&philo->common->forks_mutex[first_fork]);
 }
