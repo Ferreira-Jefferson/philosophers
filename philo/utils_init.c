@@ -6,17 +6,14 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/11 13:49:50 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/11 16:42:43 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int ft_init_mutex(t_common **common)
+static int	ft_init_basic_mutex(t_common **common)
 {
-	int i;
-	int err;
-
 	if (pthread_mutex_init(&(*common)->shutdown_mutex, NULL))
 		return (1);
 	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
@@ -30,14 +27,22 @@ int ft_init_mutex(t_common **common)
 		pthread_mutex_destroy(&(*common)->shutdown_mutex);
 		return (1);
 	}
+	return (0);
+}
 
+int	ft_init_mutex(t_common **common)
+{
+	int	i;
+	int	err;
+
+	if (ft_init_basic_mutex(common))
+		return (1);
 	i = 0;
 	while (i < (*common)->number_of_philosophers)
 	{
 		err = pthread_mutex_init(&(*common)->forks_mutex[i], NULL);
 		if (err)
 		{
-			/* destruir os que já foram inicializados */
 			while (i-- > 0)
 				pthread_mutex_destroy(&(*common)->forks_mutex[i]);
 			pthread_mutex_destroy(&(*common)->start_time_mutex);
