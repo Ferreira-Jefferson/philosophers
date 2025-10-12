@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 16:55:04 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/11 17:20:30 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/12 08:26:46 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,6 @@ int		ft_init_common(int argc, char *argv[], t_common **common);
 void	ft_generate_sem_name(const char *base, int id, char *buffer);
 void	ft_exit_all(pid_t *pids, t_common *common);
 int		ft_check_death(t_philo *philo);
-int		ft_check_all_full(t_philo *philo);
 void	ft_announce_death(t_philo *philo);
 void	ft_eating(t_philo *philo);
 void	ft_sleeping(t_philo *philo);
