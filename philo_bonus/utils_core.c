@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/08 10:19:02 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/11 16:52:40 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/12 08:53:49 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,6 @@ void	ft_close_all_2(t_common *common)
 		sem_close(common->sem_death);
 		common->sem_death = SEM_FAILED;
 	}
-	if (common->sem_full && common->sem_full != SEM_FAILED)
-	{
-		sem_close(common->sem_full);
-		common->sem_full = SEM_FAILED;
-	}
 }
 
 void	ft_close_all(t_common *common)
@@ -110,5 +105,4 @@ void	ft_close_all(t_common *common)
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_BUTLER);
 	sem_unlink(SEM_DEATH);
-	sem_unlink(SEM_FULL);
 }

@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 17:01:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 08:27:20 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/12 09:18:09 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,9 +24,6 @@ static void	ft_core(t_philo *philo)
 		if (philo->common->number_of_times_must_eat != -1 && \
 			philo->number_time_eat >= philo->common->number_of_times_must_eat)
 		{
-			sem_post(philo->common->sem_full);
-			while (!ft_check_death(philo))
-				usleep(1000);
 			if (philo->data_sem && philo->data_sem != SEM_FAILED)
 				sem_close(philo->data_sem);
 			sem_unlink(philo->data_sem_name);
@@ -35,9 +32,11 @@ static void	ft_core(t_philo *philo)
 			exit(0);
 		}
 		ft_sleeping(philo);
+		ft_verify_death_by_time(philo);
 		if (ft_check_death(philo))
 			exit(0);
 		ft_print_message(philo, "is thinking");
+		ft_verify_death_by_time(philo);
 	}
 }
 

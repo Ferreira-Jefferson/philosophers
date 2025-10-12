@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/11 16:55:04 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 08:26:46 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/12 09:17:35 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,6 @@
 # define SEM_BUTLER "/philo_butler"
 # define SEM_DATA_BASE "/philo_data_"
 # define SEM_DEATH "/philo_death"
-# define SEM_FULL "/philo_full"
 
 typedef struct s_common {
 	int				number_of_philosophers;
@@ -57,7 +56,6 @@ typedef struct s_common {
 	sem_t			*sem_print;
 	sem_t			*sem_butler;
 	sem_t			*sem_death;
-	sem_t			*sem_full;
 }	t_common;
 
 typedef struct s_philo {
@@ -80,7 +78,7 @@ int		ft_init_common(int argc, char *argv[], t_common **common);
 void	ft_generate_sem_name(const char *base, int id, char *buffer);
 void	ft_exit_all(pid_t *pids, t_common *common);
 int		ft_check_death(t_philo *philo);
-void	ft_announce_death(t_philo *philo);
+void	ft_verify_death_by_time(t_philo *philo);
 void	ft_eating(t_philo *philo);
 void	ft_sleeping(t_philo *philo);
 
