@@ -5,38 +5,48 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/11 17:01:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 09:18:09 by jtertuli         ###   ########.fr       */
+/*   Created: 2025/10/07 15:14:36 by jtertuli          #+#    #+#             */
+/*   Updated: 2025/10/13 10:09:52 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers_bonus.h"
 
+static void	ft_eating(t_philo *philo)
+{
+	sem_wait(philo->common->sem_butler);
+	sem_wait(philo->common->sem_forks);
+	ft_verity_death_by_time(philo);
+	ft_print_message(philo, "has taken a fork");
+	sem_wait(philo->common->sem_forks);
+	ft_print_message(philo, "has taken a fork");
+	ft_print_message(philo, "is eating");
+	sem_wait(philo->data_sem);
+	philo->last_meal = ft_get_time_ms();
+	philo->number_time_eat++;
+	sem_post(philo->data_sem);
+	usleep(philo->common->time_to_eat * 1000);
+	sem_post(philo->common->sem_forks);
+	sem_post(philo->common->sem_forks);
+	sem_post(philo->common->sem_butler);
+}
+
 static void	ft_core(t_philo *philo)
 {
-	if (philo->id_philo % 2 == 0)
-		usleep(philo->common->time_to_eat * 500);
 	while (1)
 	{
-		if (ft_check_death(philo))
-			exit(0);
 		ft_eating(philo);
-		if (philo->common->number_of_times_must_eat != -1 && \
-			philo->number_time_eat >= philo->common->number_of_times_must_eat)
-		{
-			if (philo->data_sem && philo->data_sem != SEM_FAILED)
-				sem_close(philo->data_sem);
-			sem_unlink(philo->data_sem_name);
-			ft_close_all(philo->common);
-			free(philo->common);
-			exit(0);
-		}
-		ft_sleeping(philo);
-		ft_verify_death_by_time(philo);
-		if (ft_check_death(philo))
-			exit(0);
+		if (philo->common->number_of_times_must_eat != -1)
+			ft_verity_death_by_saciety(philo);
+		else
+			ft_verity_death_by_time(philo);
+		ft_print_message(philo, "is sleeping");
+		usleep(philo->common->time_to_sleep * 1000);
+		if (philo->common->number_of_times_must_eat != -1)
+			ft_verity_death_by_saciety(philo);
+		else
+			ft_verity_death_by_time(philo);
 		ft_print_message(philo, "is thinking");
-		ft_verify_death_by_time(philo);
 	}
 }
 

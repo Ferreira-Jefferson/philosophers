@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:32:40 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 08:53:54 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/07 15:32:46 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,15 +17,13 @@ static int	ft_init_semaphores(t_common *common)
 	sem_unlink(SEM_FORKS);
 	sem_unlink(SEM_PRINT);
 	sem_unlink(SEM_BUTLER);
-	sem_unlink(SEM_DEATH);
 	common->sem_forks = sem_open(SEM_FORKS, O_CREAT, 0644,
 			common->number_of_philosophers);
 	common->sem_print = sem_open(SEM_PRINT, O_CREAT, 0644, 1);
 	common->sem_butler = sem_open(SEM_BUTLER, O_CREAT, 0644,
 			common->number_of_philosophers - 1);
-	common->sem_death = sem_open(SEM_DEATH, O_CREAT, 0644, 0);
 	if (common->sem_forks == SEM_FAILED || common->sem_print == SEM_FAILED
-		|| common->sem_butler == SEM_FAILED || common->sem_death == SEM_FAILED)
+		|| common->sem_butler == SEM_FAILED)
 		return (1);
 	return (0);
 }

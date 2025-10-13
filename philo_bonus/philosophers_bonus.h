@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/10/11 16:55:04 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 09:17:35 by jtertuli         ###   ########.fr       */
+/*   Created: 2025/10/07 15:32:30 by jtertuli          #+#    #+#             */
+/*   Updated: 2025/10/09 14:20:15 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,6 @@
 # include <sys/time.h>
 # include <sys/wait.h>
 # include <fcntl.h>
-# include <signal.h>
 
 # define RED_BOLD "\033[1;31m"
 # define RED "\33[31m"
@@ -38,12 +37,6 @@
 # define SEM_PRINT "/philo_print"
 # define SEM_BUTLER "/philo_butler"
 # define SEM_DATA_BASE "/philo_data_"
-# define SEM_DEATH "/philo_death"
-# define SEM_FORKS "/philo_forks"
-# define SEM_PRINT "/philo_print"
-# define SEM_BUTLER "/philo_butler"
-# define SEM_DATA_BASE "/philo_data_"
-# define SEM_DEATH "/philo_death"
 
 typedef struct s_common {
 	int				number_of_philosophers;
@@ -55,7 +48,6 @@ typedef struct s_common {
 	sem_t			*sem_forks;
 	sem_t			*sem_print;
 	sem_t			*sem_butler;
-	sem_t			*sem_death;
 }	t_common;
 
 typedef struct s_philo {
@@ -77,9 +69,7 @@ void	ft_print_message(t_philo *philo, char *message);
 int		ft_init_common(int argc, char *argv[], t_common **common);
 void	ft_generate_sem_name(const char *base, int id, char *buffer);
 void	ft_exit_all(pid_t *pids, t_common *common);
-int		ft_check_death(t_philo *philo);
-void	ft_verify_death_by_time(t_philo *philo);
-void	ft_eating(t_philo *philo);
-void	ft_sleeping(t_philo *philo);
+void	ft_verity_death_by_saciety(t_philo *philo);
+void	ft_verity_death_by_time(t_philo *philo);
 
 #endif

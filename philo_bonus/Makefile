@@ -4,29 +4,27 @@ CC = cc
 CFLAGS = -g -Wall -Werror -Wextra -pthread
 VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 
+PHILO_DIR = ./
 OBJS_DIR = ../objs
 
+PHILO_SRC = core_bonus.c libft_bonus.c philosophers_bonus.c utils_core_bonus.c utils_init_bonus.c utils_bonus.c
 
-
-PHILO_DIR = ./
-PHILO_SRC = $(wildcard $(PHILO_DIR)/*.c)
-
-PHILO_OBJ = $(patsubst $(PHILO_DIR)/%.c,$(OBJS_DIR)/%.o,$(PHILO_SRC))
+PHILO_OBJ = $(addprefix $(OBJS_DIR)/, $(PHILO_SRC:.c=.o))
 
 INCLUDE_DIRS = -I$(PHILO_DIR)
 
 all: bonus
 
+bonus: $(NAME)
+
 $(NAME): $(PHILO_OBJ)
-	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $(PHILO_OBJ) -lpthread
+	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -o $@ $(PHILO_OBJ)
 
 $(OBJS_DIR):
 	mkdir -p $(OBJS_DIR)
 
 $(OBJS_DIR)/%.o: $(PHILO_DIR)/%.c | $(OBJS_DIR)
 	$(CC) $(CFLAGS) $(INCLUDE_DIRS) -c $< -o $@
-
-bonus: $(NAME)
 
 clean:
 	rm -f $(PHILO_OBJ)
@@ -36,4 +34,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re bonus
