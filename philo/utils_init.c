@@ -6,53 +6,39 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/11 16:42:43 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/02 16:00:48 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static int	ft_init_basic_mutex(t_common **common)
-{
-	if (pthread_mutex_init(&(*common)->shutdown_mutex, NULL))
-		return (1);
-	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
-	{
-		pthread_mutex_destroy(&(*common)->shutdown_mutex);
-		return (1);
-	}
-	if (pthread_mutex_init(&(*common)->start_time_mutex, NULL))
-	{
-		pthread_mutex_destroy(&(*common)->printf_mutex);
-		pthread_mutex_destroy(&(*common)->shutdown_mutex);
-		return (1);
-	}
-	return (0);
-}
-
 int	ft_init_mutex(t_common **common)
 {
 	int	i;
-	int	err;
+	int	error;
 
-	if (ft_init_basic_mutex(common))
+	if (pthread_mutex_init(&(*common)->shutdown_mutex, NULL))
 		return (1);
+	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
+		return (pthread_mutex_destroy(&(*common)->shutdown_mutex) + 1);
+	if (pthread_mutex_init(&(*common)->start_time_mutex, NULL))
+		return (pthread_mutex_destroy(&(*common)->printf_mutex) + 1);
+	error = 0;
 	i = 0;
 	while (i < (*common)->number_of_philosophers)
 	{
-		err = pthread_mutex_init(&(*common)->forks_mutex[i], NULL);
-		if (err)
+		error += pthread_mutex_init(&(*common)->forks_mutex[i], NULL);
+		if (error)
 		{
-			while (i-- > 0)
+			while (i--)
 				pthread_mutex_destroy(&(*common)->forks_mutex[i]);
-			pthread_mutex_destroy(&(*common)->start_time_mutex);
-			pthread_mutex_destroy(&(*common)->printf_mutex);
 			pthread_mutex_destroy(&(*common)->shutdown_mutex);
-			return (1);
+			pthread_mutex_destroy(&(*common)->printf_mutex);
+			break ;
 		}
 		i++;
 	}
-	return (0);
+	return (error);
 }
 
 int	ft_init_common(int argc, char *argv[], t_common **common)

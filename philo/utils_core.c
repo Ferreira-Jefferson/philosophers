@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/11 16:43:06 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/12 12:15:37 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,25 +40,13 @@ void	ft_create(pthread_t	*thr_philos, pthread_t	*thr_monitor, \
 	pthread_create(thr_monitor, NULL, &ft_monitor, philos);
 }
 
-void	ft_get_forks_id(t_philo *philo, int *first_fork, int *second_fork)
+void	ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork)
 {
 	int	id;
-	int	left_fork;
-	int	right_fork;
 
 	id = philo->id_philo;
-	left_fork = id;
-	right_fork = (id + 1) % philo->common->number_of_philosophers;
-	if (left_fork < right_fork)
-	{
-		*first_fork = left_fork;
-		*second_fork = right_fork;
-	}
-	else
-	{
-		*first_fork = right_fork;
-		*second_fork = left_fork;
-	}
+	*left_fork = id;
+	*right_fork = (id + 1) % philo->common->number_of_philosophers;
 }
 
 int	ft_should_shutdown(t_philo *philo)
@@ -80,15 +68,15 @@ int	ft_should_shutdown(t_philo *philo)
 
 void	ft_eating(t_philo *philo)
 {
-	int	first_fork;
-	int	second_fork;
+	int	left_fork;
+	int	right_fork;
 
 	if (ft_should_shutdown(philo))
 		return ;
-	ft_get_forks_id(philo, &first_fork, &second_fork);
-	pthread_mutex_lock(&philo->common->forks_mutex[first_fork]);
+	ft_get_forks_id(philo, &left_fork, &right_fork);
+	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
 	ft_print_message(philo, "has taken a fork");
-	pthread_mutex_lock(&philo->common->forks_mutex[second_fork]);
+	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
 	ft_print_message(philo, "has taken a fork");
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = ft_get_time_ms();
@@ -96,6 +84,6 @@ void	ft_eating(t_philo *philo)
 	pthread_mutex_unlock(&philo->last_meal_mutex);
 	ft_print_message(philo, "is eating");
 	usleep(philo->common->time_to_eat * 1000);
-	pthread_mutex_unlock(&philo->common->forks_mutex[second_fork]);
-	pthread_mutex_unlock(&philo->common->forks_mutex[first_fork]);
+	pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
+	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
 }
