@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:05 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 07:48:25 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:29:38 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ void	*ft_monitor(void *args)
 		}
 		else if (ft_check_all_fed(philos, number_of_philos))
 			return (NULL);
-		usleep(500);
+		ft_usleep(500);
 	}
 	return (NULL);
 }

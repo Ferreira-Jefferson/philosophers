@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/12 12:15:37 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:59:53 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,13 +40,42 @@ void	ft_create(pthread_t	*thr_philos, pthread_t	*thr_monitor, \
 	pthread_create(thr_monitor, NULL, &ft_monitor, philos);
 }
 
-void	ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork)
+void	ft_lock_forks(t_philo *philo)
 {
-	int	id;
+	int	i;
+	int qtd;
 
-	id = philo->id_philo;
-	*left_fork = id;
-	*right_fork = (id + 1) % philo->common->number_of_philosophers;
+	qtd = philo->common->number_of_philosophers;
+	i = philo->id_philo;
+
+	if (i == qtd - 1) { 
+		pthread_mutex_lock(&philo->common->forks_mutex[(i + 1) % qtd]);
+		ft_print_message(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->common->forks_mutex[i]);
+		ft_print_message(philo, "has taken a fork");
+	} else {
+		pthread_mutex_lock(&philo->common->forks_mutex[i]);
+		ft_print_message(philo, "has taken a fork");
+		pthread_mutex_lock(&philo->common->forks_mutex[(i + 1) % qtd]);
+		ft_print_message(philo, "has taken a fork");
+	}
+}
+
+void	ft_unlock_forks(t_philo *philo)
+{
+	int	i;
+	int qtd;
+
+	qtd = philo->common->number_of_philosophers;
+	i = philo->id_philo;
+
+	if (i == qtd - 1) { 
+		pthread_mutex_unlock(&philo->common->forks_mutex[(i + 1) % qtd]);
+		pthread_mutex_unlock(&philo->common->forks_mutex[i]);
+	} else {
+		pthread_mutex_unlock(&philo->common->forks_mutex[i]);
+		pthread_mutex_unlock(&philo->common->forks_mutex[(i + 1) % qtd]);
+	}
 }
 
 int	ft_should_shutdown(t_philo *philo)
@@ -68,22 +97,23 @@ int	ft_should_shutdown(t_philo *philo)
 
 void	ft_eating(t_philo *philo)
 {
-	int	left_fork;
-	int	right_fork;
-
 	if (ft_should_shutdown(philo))
 		return ;
-	ft_get_forks_id(philo, &left_fork, &right_fork);
-	pthread_mutex_lock(&philo->common->forks_mutex[left_fork]);
-	ft_print_message(philo, "has taken a fork");
-	pthread_mutex_lock(&philo->common->forks_mutex[right_fork]);
-	ft_print_message(philo, "has taken a fork");
+	ft_lock_forks(philo);
 	pthread_mutex_lock(&philo->last_meal_mutex);
 	philo->last_meal = ft_get_time_ms();
 	philo->number_time_eat++;
 	pthread_mutex_unlock(&philo->last_meal_mutex);
 	ft_print_message(philo, "is eating");
-	usleep(philo->common->time_to_eat * 1000);
-	pthread_mutex_unlock(&philo->common->forks_mutex[right_fork]);
-	pthread_mutex_unlock(&philo->common->forks_mutex[left_fork]);
+	ft_usleep(philo->common->time_to_eat * 1000);
+	ft_unlock_forks(philo);
+}
+
+void ft_usleep(int time)
+{
+	while (time <= 0)
+	{
+		usleep(time / 10);
+		time /= 10;
+	}
 }

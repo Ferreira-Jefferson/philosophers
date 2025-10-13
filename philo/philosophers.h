@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:29:59 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/08 08:09:47 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/13 16:50:57 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -69,8 +69,8 @@ void	ft_eating(t_philo *philo);
 // utils_core.c
 void	ft_create(pthread_t	*thr_philos, pthread_t	*thr_monitor, \
 	t_philo *philos, t_common *common);
-void	ft_get_forks_id(t_philo *philo, int *left_fork, int *right_fork);
-
+void	ft_lock_fork(t_philo *philo);
+void	ft_unlock_fork(t_philo *philo);
 // utils.c
 void	ft_print_message(t_philo *philo, char *message);
 void	ft_join(int quantity, pthread_t *thr_philos, pthread_t	*thr_monitor);
@@ -81,5 +81,6 @@ long	ft_get_time_ms(void);
 // utils_init.c
 int		ft_init_mutex(t_common **common);
 int		ft_init_common(int argc, char *argv[], t_common **common);
+void	ft_usleep(int time);
 
 #endif
