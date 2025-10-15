@@ -36,28 +36,29 @@ Key constraints and goals:
 Use the tree-style layout below (examples of the main files present in each folder):
 
 ```
-philosophers/
-├── philo/                    # mandatory implementation (threads + mutexes)
-│   ├── philo                 # binary after make
+├── objs/
+│   └── file.o
+├── philo/					# mandatory implementation (threads + mutexes)
+│   ├── philo				# binary after make
+│   ├── Makefile
 │   ├── core.c
+│   ├── libft.c
 │   ├── monitor.c
 │   ├── philosophers.c
-│   ├── utils_core.c
-│   ├── utils_init.c
-│   ├── utils.c
-│   ├── libft.c
 │   ├── philosophers.h
-|	└── Makefile 
-├── philo_bonus/             # bonus implementation (processes + semaphores)
-│   ├── philo_bonus           # binary after make
+│   ├── utils.c
+│   └── utils_init.c
+├── philo_bonus/			# bonus implementation (processes + semaphores)
+│   ├── philo_bonus			# binary after make
+│   ├── Makefile
 │   ├── core_bonus.c
-│   ├── monitor_bonus.c
-│   ├── philosophers_bonus.c
-│   ├── utils_core.c
-│   ├── utils_init_bonus.c
-│   ├── utils_bonus.c
 │   ├── libft_bonus.c
-│   └── Makefile 
+│   ├── philosophers_bonus.c
+│   ├── philosophers_bonus.h
+│   ├── utils_bonus.c
+│   ├── utils_core_bonus.c
+│   └── utils_init_bonus.c
+├── .gitignore
 ├── LICENSE
 └── README.md
 ```
