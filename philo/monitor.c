@@ -6,62 +6,67 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/01 15:08:05 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/13 16:29:38 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/15 07:36:23 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-static int	ft_verify_death(t_philo *philo)
+int	ft_verify_death(t_philo *philo, size_t time_to_die)
 {
-	long	last_meal_time;
-
-	pthread_mutex_lock(&philo->common->shutdown_mutex);
-	if (philo->common->shutdown)
-		return (pthread_mutex_unlock(&philo->common->shutdown_mutex) + 1);
-	pthread_mutex_unlock(&philo->common->shutdown_mutex);
-	pthread_mutex_lock(&philo->last_meal_mutex);
-	last_meal_time = philo->last_meal;
-	pthread_mutex_unlock(&philo->last_meal_mutex);
-	if ((ft_get_time_ms() - last_meal_time) > philo->common->time_to_die)
+	pthread_mutex_lock(philo->meal_lock);
+	if (ft_get_time_ms() - philo->last_meal >= time_to_die
+		&& philo->eating == 0)
 	{
-		pthread_mutex_lock(&philo->common->shutdown_mutex);
-		if (!philo->common->shutdown)
+		pthread_mutex_unlock(philo->meal_lock);
+		return (1);
+	}
+	pthread_mutex_unlock(philo->meal_lock);
+	return (0);
+}
+
+int	ft_check_any_died(t_philo *philos)
+{
+	int	i;
+
+	i = 0;
+	while (i < philos[0].common.number_of_philosophers)
+	{
+		if (ft_verify_death(&philos[i], philos[i].common.time_to_die))
 		{
-			philo->common->shutdown = 1;
-			pthread_mutex_unlock(&philo->common->shutdown_mutex);
-			ft_print_message(philo, "died");
+			ft_print_message("died", &philos[i], philos[i].id);
+			pthread_mutex_lock(philos[0].dead_lock);
+			*philos->dead = 1;
+			pthread_mutex_unlock(philos[0].dead_lock);
 			return (1);
 		}
-		pthread_mutex_unlock(&philo->common->shutdown_mutex);
+		i++;
 	}
 	return (0);
 }
 
-static int	ft_check_all_fed(t_philo *philos, int num_philos)
+int	ft_check_if_all_ate(t_philo *philos)
 {
-	int		i;
-	int		all_fed;
-	long	times_eaten;
+	int	i;
+	int	finished_eating;
 
-	if (philos[0].common->number_of_times_must_eat == -1)
-		return (0);
-	all_fed = 1;
 	i = 0;
-	while (all_fed && i < num_philos)
+	finished_eating = 0;
+	if (philos[0].common.number_of_times_must_eat == -1)
+		return (0);
+	while (i < philos[0].common.number_of_philosophers)
 	{
-		pthread_mutex_lock(&philos[i].last_meal_mutex);
-		times_eaten = philos[i].number_time_eat;
-		pthread_mutex_unlock(&philos[i].last_meal_mutex);
-		if (times_eaten < philos[0].common->number_of_times_must_eat)
-			all_fed = 0;
+		pthread_mutex_lock(philos[i].meal_lock);
+		if (philos[i].meals_eaten >= philos[i].common.number_of_times_must_eat)
+			finished_eating++;
+		pthread_mutex_unlock(philos[i].meal_lock);
 		i++;
 	}
-	if (all_fed)
+	if (finished_eating == philos[0].common.number_of_philosophers)
 	{
-		pthread_mutex_lock(&philos[0].common->shutdown_mutex);
-		philos[0].common->shutdown = 1;
-		pthread_mutex_unlock(&philos[0].common->shutdown_mutex);
+		pthread_mutex_lock(philos[0].dead_lock);
+		*philos->dead = 1;
+		pthread_mutex_unlock(philos[0].dead_lock);
 		return (1);
 	}
 	return (0);
@@ -70,26 +75,10 @@ static int	ft_check_all_fed(t_philo *philos, int num_philos)
 void	*ft_monitor(void *args)
 {
 	t_philo	*philos;
-	int		number_of_philos;
-	int		i;
 
-	philos = (t_philo *) args;
-	number_of_philos = philos[0].common->number_of_philosophers;
+	philos = (t_philo *)args;
 	while (1)
-	{
-		i = 0;
-		if (philos[0].common->number_of_times_must_eat == -1)
-		{
-			while (i < number_of_philos)
-			{
-				if (ft_verify_death(&philos[i]))
-					return (NULL);
-				i++;
-			}
-		}
-		else if (ft_check_all_fed(philos, number_of_philos))
-			return (NULL);
-		ft_usleep(500);
-	}
-	return (NULL);
+		if (ft_check_any_died(philos) == 1 || ft_check_if_all_ate(philos) == 1)
+			break ;
+	return (args);
 }

@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:26:19 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/09 14:16:30 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/14 08:56:31 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,10 @@ static int	ft_validation(int argc, char *argv[])
 	if (argc == 1)
 		return (1);
 	if (argc < 5 || argc > 6)
-		return (ft_error_message(argc, argv));
+	{
+		printf("%sInvalid numbers of arguments%s\n", RED_BOLD, END_COLOR);
+		return (1);
+	}
 	if (ft_atoi(argv[1]) == 0)
 		return (ft_error_message(argc, argv));
 	i = 1;
@@ -61,8 +64,10 @@ static int	ft_validation(int argc, char *argv[])
 
 int	main(int argc, char *argv[])
 {
-	t_common	*common;
-	int			error;
+	t_common		common;
+	t_table			table;
+	t_philo			philos[PHILO_MAX];
+	pthread_mutex_t	forks[PHILO_MAX];
 
 	if (ft_validation(argc, argv))
 		return (0);
@@ -72,9 +77,11 @@ int	main(int argc, char *argv[])
 		printf("%s %d %s\n", argv[2], 1, "died");
 		return (0);
 	}
-	error = ft_init_common(argc, argv, &common);
-	if (!error)
-		ft_start(&common);
-	ft_free_common(&common);
+	ft_init_common(argc, argv, &common);
+	ft_init_table(&table, philos);
+	ft_init_forks(forks, common.number_of_philosophers);
+	ft_init_philos(&common, philos, &table, forks);
+	ft_thread_create(&table, forks);
+	ft_destory_all(&table, forks);
 	return (0);
 }

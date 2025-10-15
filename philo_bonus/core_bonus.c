@@ -6,7 +6,7 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/10/07 15:14:36 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/13 10:09:52 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/13 17:31:54 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ static void	ft_eating(t_philo *philo)
 	philo->last_meal = ft_get_time_ms();
 	philo->number_time_eat++;
 	sem_post(philo->data_sem);
-	usleep(philo->common->time_to_eat * 1000);
+	usleep(philo->common->time_to_eat);
 	sem_post(philo->common->sem_forks);
 	sem_post(philo->common->sem_forks);
 	sem_post(philo->common->sem_butler);
@@ -41,7 +41,7 @@ static void	ft_core(t_philo *philo)
 		else
 			ft_verity_death_by_time(philo);
 		ft_print_message(philo, "is sleeping");
-		usleep(philo->common->time_to_sleep * 1000);
+		usleep(philo->common->time_to_sleep);
 		if (philo->common->number_of_times_must_eat != -1)
 			ft_verity_death_by_saciety(philo);
 		else

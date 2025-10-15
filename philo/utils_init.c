@@ -6,64 +6,68 @@
 /*   By: jtertuli <jtertuli@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2025/09/28 08:23:12 by jtertuli          #+#    #+#             */
-/*   Updated: 2025/10/02 16:00:48 by jtertuli         ###   ########.fr       */
+/*   Updated: 2025/10/14 09:29:32 by jtertuli         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 
-int	ft_init_mutex(t_common **common)
+void	ft_init_common(int argc, char *argv[], t_common *common)
 {
-	int	i;
-	int	error;
-
-	if (pthread_mutex_init(&(*common)->shutdown_mutex, NULL))
-		return (1);
-	if (pthread_mutex_init(&(*common)->printf_mutex, NULL))
-		return (pthread_mutex_destroy(&(*common)->shutdown_mutex) + 1);
-	if (pthread_mutex_init(&(*common)->start_time_mutex, NULL))
-		return (pthread_mutex_destroy(&(*common)->printf_mutex) + 1);
-	error = 0;
-	i = 0;
-	while (i < (*common)->number_of_philosophers)
-	{
-		error += pthread_mutex_init(&(*common)->forks_mutex[i], NULL);
-		if (error)
-		{
-			while (i--)
-				pthread_mutex_destroy(&(*common)->forks_mutex[i]);
-			pthread_mutex_destroy(&(*common)->shutdown_mutex);
-			pthread_mutex_destroy(&(*common)->printf_mutex);
-			break ;
-		}
-		i++;
-	}
-	return (error);
+	common->number_of_philosophers = ft_atoi(argv[1]);
+	common->time_to_die = ft_atoi(argv[2]);
+	common->time_to_eat = ft_atoi(argv[3]);
+	common->time_to_sleep = ft_atoi(argv[4]);
+	common->number_of_times_must_eat = -1;
+	if (argc == 6)
+		common->number_of_times_must_eat = ft_atoi(argv[5]);
 }
 
-int	ft_init_common(int argc, char *argv[], t_common **common)
+void	ft_init_philos(t_common *common, t_philo *philos, \
+	t_table *table, pthread_mutex_t *forks)
 {
-	*common = (t_common *) malloc(sizeof(t_common));
-	if (*common == NULL)
-		return (1);
-	(*common)->shutdown = 0;
-	(*common)->number_of_philosophers = ft_atoi(argv[1]);
-	(*common)->time_to_die = ft_atoi(argv[2]);
-	(*common)->time_to_eat = ft_atoi(argv[3]);
-	(*common)->time_to_sleep = ft_atoi(argv[4]);
-	(*common)->number_of_times_must_eat = -1;
-	(*common)->start_time = ft_get_time_ms();
-	if (argc == 6)
-		(*common)->number_of_times_must_eat = ft_atoi(argv[5]);
-	(*common)->forks_mutex = (pthread_mutex_t *) \
-		malloc((*common)->number_of_philosophers * sizeof(pthread_mutex_t));
-	if ((*common)->forks_mutex == NULL)
-		return (1);
-	if (ft_init_mutex(common) != 0)
+	int	i;
+
+	i = 0;
+	while (i < common->number_of_philosophers)
 	{
-		free((*common)->forks_mutex);
-		free(*common);
-		return (1);
+		philos[i].common = *common;
+		philos[i].id = i + 1;
+		philos[i].eating = 0;
+		philos[i].meals_eaten = 0;
+		philos[i].start_time = ft_get_time_ms();
+		philos[i].last_meal = ft_get_time_ms();
+		philos[i].write_lock = &table->write_lock;
+		philos[i].dead_lock = &table->dead_lock;
+		philos[i].meal_lock = &table->meal_lock;
+		philos[i].dead = &table->dead_flag;
+		philos[i].l_fork = &forks[i];
+		if (i == 0)
+			philos[i].r_fork = &forks[philos[i]
+				.common.number_of_philosophers - 1];
+		else
+			philos[i].r_fork = &forks[i - 1];
+		i++;
 	}
-	return (0);
+}
+
+void	ft_init_table(t_table *table, t_philo *philos)
+{
+	table->dead_flag = 0;
+	table->philos = philos;
+	pthread_mutex_init(&table->write_lock, NULL);
+	pthread_mutex_init(&table->dead_lock, NULL);
+	pthread_mutex_init(&table->meal_lock, NULL);
+}
+
+void	ft_init_forks(pthread_mutex_t *forks, int philo_num)
+{
+	int	i;
+
+	i = 0;
+	while (i < philo_num)
+	{
+		pthread_mutex_init(&forks[i], NULL);
+		i++;
+	}
 }

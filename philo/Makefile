@@ -7,7 +7,7 @@ VALGRIND = valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes
 PHILO_DIR = ./
 OBJS_DIR = ../objs
 
-PHILO_SRC = core.c libft.c monitor.c philosophers.c utils_core.c utils_init.c utils.c
+PHILO_SRC = core.c libft.c monitor.c philosophers.c utils_init.c utils.c
 
 PHILO_OBJ = $(addprefix $(OBJS_DIR)/, $(PHILO_SRC:.c=.o))
 
